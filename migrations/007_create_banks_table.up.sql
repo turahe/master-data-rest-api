@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS tm_banks (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    alias VARCHAR(255) NOT NULL,
+    company VARCHAR(255) NOT NULL,
+    code VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_code (code),
+    INDEX idx_name (name),
+    INDEX idx_alias (alias),
+    INDEX idx_company (company)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 
