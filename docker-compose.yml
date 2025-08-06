@@ -18,7 +18,7 @@ services:
 
   # Application
   app:
-    build: .
+    image: turahe/master-data-rest-api:latest
     container_name: master_data_api
     restart: unless-stopped
     ports:
