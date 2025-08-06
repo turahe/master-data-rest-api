@@ -1,20 +1,17 @@
-version: '3.8'
-
 services:
-  # MySQL Database
-  mysql:
-    image: mysql:8.0
-    container_name: master_data_mysql
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: master_data_postgres
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: master_data
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: apppassword
+      POSTGRES_DB: ${POSTGRES_DB:-master_data}
+      POSTGRES_USER: ${POSTGRES_USER:-appuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-apppassword}
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d
     networks:
       - master_data_network
@@ -27,18 +24,17 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - APP_ENV=development
-      - APP_PORT=8080
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_NAME=master_data
-      - DB_USER=appuser
-      - DB_PASSWORD=apppassword
-      - DB_CHARSET=utf8mb4
-      - DB_PARSE_TIME=true
-      - DB_LOC=Local
+      APP_ENV: ${APP_ENV:-development}
+      APP_PORT: ${APP_PORT:-8080}
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-master_data}
+      DB_USER: ${DB_USER:-appuser}
+      DB_PASSWORD: ${DB_PASSWORD:-apppassword}
+      DB_DRIVER: ${DB_DRIVER:-postgres}
+      DB_SSL_MODE: ${DB_SSL_MODE:-disable}
     depends_on:
-      - mysql
+      - postgres
     networks:
       - master_data_network
 
@@ -55,8 +51,10 @@ services:
       - master_data_network
 
 volumes:
-  mysql_data:
+  postgres_data:
+    driver: local
   redis_data:
+    driver: local
 
 networks:
   master_data_network:

@@ -1,25 +1,15 @@
 CREATE TABLE IF NOT EXISTS tm_currencies (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    priority INT NULL DEFAULT 100,
-    iso_code VARCHAR(16) NOT NULL,
-    name VARCHAR(255) NULL,
-    symbol VARCHAR(255) NULL,
-    disambiguate_symbol VARCHAR(255) NULL,
-    alternate_symbols VARCHAR(255) NULL,
-    subunit VARCHAR(255) NULL,
-    subunit_to_unit INT NOT NULL DEFAULT 100,
-    symbol_first BOOLEAN NOT NULL DEFAULT TRUE,
-    html_entity VARCHAR(255) NULL,
-    decimal_mark VARCHAR(25) NULL,
-    thousands_separator VARCHAR(25) NULL,
-    iso_numeric VARCHAR(25) NULL,
-    smallest_denomination INT NOT NULL DEFAULT 1,
+    id CHAR(36) NOT NULL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(3) NOT NULL,
+    symbol VARCHAR(10) NULL,
+    decimal_places INT NOT NULL DEFAULT 2,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_iso_code (iso_code),
-    INDEX idx_iso_code (iso_code),
-    INDEX idx_name (name),
-    INDEX idx_symbol (symbol),
-    INDEX idx_iso_numeric (iso_numeric),
-    INDEX idx_priority (priority)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_code ON tm_currencies(code);
+CREATE INDEX idx_name ON tm_currencies(name);
+CREATE INDEX idx_symbol ON tm_currencies(symbol);
+CREATE INDEX idx_is_active ON tm_currencies(is_active); 

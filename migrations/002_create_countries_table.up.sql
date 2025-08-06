@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS tm_countries (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id CHAR(36) NOT NULL PRIMARY KEY,
     capital VARCHAR(255) NULL,
     citizenship VARCHAR(255) NULL,
     country_code VARCHAR(3) NOT NULL,
@@ -19,11 +19,12 @@ CREATE TABLE IF NOT EXISTS tm_countries (
     latitude VARCHAR(255) NULL,
     longitude VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_country_code (country_code),
-    INDEX idx_iso_3166_2 (iso_3166_2),
-    INDEX idx_iso_3166_3 (iso_3166_3),
-    INDEX idx_calling_code (calling_code),
-    INDEX idx_latitude (latitude),
-    INDEX idx_longitude (longitude)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_country_code ON tm_countries(country_code);
+CREATE INDEX idx_iso_3166_2 ON tm_countries(iso_3166_2);
+CREATE INDEX idx_iso_3166_3 ON tm_countries(iso_3166_3);
+CREATE INDEX idx_calling_code ON tm_countries(calling_code);
+CREATE INDEX idx_latitude ON tm_countries(latitude);
+CREATE INDEX idx_longitude ON tm_countries(longitude); 

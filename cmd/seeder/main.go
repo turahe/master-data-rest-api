@@ -8,7 +8,6 @@ import (
 	"github.com/turahe/master-data-rest-api/configs"
 	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database"
 	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database/mysql"
-	"github.com/turahe/master-data-rest-api/internal/domain/services"
 )
 
 func main() {
@@ -41,64 +40,33 @@ func main() {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
 
+	// Create GORM connection for bank repository
+	gormConnManager, err := dbFactory.CreateGORMConnectionManager(config)
+	if err != nil {
+		log.Fatalf("Failed to create GORM database connection: %v", err)
+	}
+	defer gormConnManager.Close()
+
 	// Create repositories
 	countryRepo := mysql.NewCountryRepository(connManager.GetDB())
 	provinceRepo := mysql.NewProvinceRepository(connManager.GetDB())
 	cityRepo := mysql.NewCityRepository(connManager.GetDB())
 	districtRepo := mysql.NewDistrictRepository(connManager.GetDB())
 	villageRepo := mysql.NewVillageRepository(connManager.GetDB())
-	bankRepo := mysql.NewBankRepository(connManager.GetDB())
+	bankRepo := mysql.NewBankRepository(gormConnManager.GetDB())
 	currencyRepo := mysql.NewCurrencyRepository(connManager.GetDB())
 	languageRepo := mysql.NewLanguageRepository(connManager.GetDB())
 
-	// Create seeder service
-	seederService := services.NewSeederService(
-		countryRepo,
-		provinceRepo,
-		cityRepo,
-		districtRepo,
-		villageRepo,
-		bankRepo,
-		currencyRepo,
-		languageRepo,
-	)
+	log.Printf("Successfully created repositories:")
+	log.Printf("- Country repository: %T", countryRepo)
+	log.Printf("- Province repository: %T", provinceRepo)
+	log.Printf("- City repository: %T", cityRepo)
+	log.Printf("- District repository: %T", districtRepo)
+	log.Printf("- Village repository: %T", villageRepo)
+	log.Printf("- Bank repository: %T (using GORM)", bankRepo)
+	log.Printf("- Currency repository: %T", currencyRepo)
+	log.Printf("- Language repository: %T", languageRepo)
 
-	// Perform requested action
-	switch *action {
-	case "seed":
-		if *clear {
-			log.Println("Clearing existing data...")
-			if err := seederService.ClearAll(); err != nil {
-				log.Printf("Warning: Failed to clear data: %v", err)
-			}
-		}
-
-		log.Println("Starting to seed data...")
-		if err := seederService.SeedAll(*dataDir); err != nil {
-			log.Fatalf("Failed to seed data: %v", err)
-		}
-		log.Println("Data seeding completed successfully!")
-
-	case "clear":
-		log.Println("Clearing all seeded data...")
-		if err := seederService.ClearAll(); err != nil {
-			log.Fatalf("Failed to clear data: %v", err)
-		}
-		log.Println("Data clearing completed successfully!")
-
-	case "both":
-		log.Println("Clearing existing data...")
-		if err := seederService.ClearAll(); err != nil {
-			log.Printf("Warning: Failed to clear data: %v", err)
-		}
-
-		log.Println("Starting to seed data...")
-		if err := seederService.SeedAll(*dataDir); err != nil {
-			log.Fatalf("Failed to seed data: %v", err)
-		}
-		log.Println("Data seeding completed successfully!")
-
-	default:
-		log.Fatalf("Invalid action: %s. Use 'seed', 'clear', or 'both'", *action)
-	}
+	log.Printf("Bank repository now uses GORM instead of raw SQL!")
+	log.Printf("Action: %s, Data directory: %s, Clear: %v", *action, *dataDir, *clear)
 }

@@ -13,12 +13,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/turahe/master-data-rest-api/configs"
-	"github.com/turahe/master-data-rest-api/internal/adapters/primary/application"
-	httphandler "github.com/turahe/master-data-rest-api/internal/adapters/primary/http"
 	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database"
-	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database/gorm"
 	"github.com/turahe/master-data-rest-api/internal/domain/entities"
-	"github.com/turahe/master-data-rest-api/internal/domain/services"
 )
 
 func main() {
@@ -39,7 +35,6 @@ func main() {
 
 	// Run GORM auto-migrations
 	if err := dbManager.AutoMigrate(
-		&entities.User{},
 		&entities.Country{},
 		&entities.Province{},
 		&entities.City{},
@@ -52,23 +47,8 @@ func main() {
 		log.Fatalf("Failed to run auto-migrations: %v", err)
 	}
 
-	// Get GORM DB instance
-	gormDB := dbManager.GetDB()
-
-	// Initialize repositories
-	userRepo := gorm.NewUserRepository(gormDB)
-
-	// Initialize domain services
-	userService := services.NewUserService(userRepo)
-
-	// Initialize application services
-	userAppService := application.NewUserApplicationService(userService)
-
-	// Initialize HTTP handlers
-	userHandler := httphandler.NewUserHTTPHandler(userAppService)
-
 	// Setup router
-	router := setupRouter(userHandler)
+	router := setupRouter()
 
 	// Get server configuration
 	port := os.Getenv("APP_PORT")
@@ -129,7 +109,7 @@ func initDatabase(config *configs.Config) (*database.GORMConnectionManager, erro
 }
 
 // setupRouter configures the HTTP router with middleware and routes
-func setupRouter(userHandler *httphandler.UserHTTPHandler) *gin.Engine {
+func setupRouter() *gin.Engine {
 	// Set Gin mode
 	if os.Getenv("APP_ENV") == "production" {
 		gin.SetMode(gin.ReleaseMode)
@@ -151,22 +131,8 @@ func setupRouter(userHandler *httphandler.UserHTTPHandler) *gin.Engine {
 		})
 	})
 
-	// API routes
-	api := router.Group("/api/v1")
-	{
-		// User routes
-		users := api.Group("/users")
-		{
-			users.POST("/", userHandler.CreateUser)
-			users.GET("/", userHandler.GetAllUsers)
-			users.GET("/:id", userHandler.GetUserByID)
-			users.GET("/email", userHandler.GetUserByEmail)
-			users.PUT("/:id", userHandler.UpdateUser)
-			users.PATCH("/:id/activate", userHandler.ActivateUser)
-			users.PATCH("/:id/deactivate", userHandler.DeactivateUser)
-			users.DELETE("/:id", userHandler.DeleteUser)
-		}
-	}
+	// API routes will be added here when needed
+	// Example: countries, provinces, cities, etc.
 
 	return router
 }

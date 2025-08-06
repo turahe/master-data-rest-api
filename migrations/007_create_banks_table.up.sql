@@ -1,13 +1,14 @@
 CREATE TABLE IF NOT EXISTS tm_banks (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id CHAR(36) NOT NULL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     alias VARCHAR(255) NOT NULL,
     company VARCHAR(255) NOT NULL,
     code VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_code (code),
-    INDEX idx_name (name),
-    INDEX idx_alias (alias),
-    INDEX idx_company (company)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_code ON tm_banks(code);
+CREATE INDEX idx_name ON tm_banks(name);
+CREATE INDEX idx_alias ON tm_banks(alias);
+CREATE INDEX idx_company ON tm_banks(company); 
