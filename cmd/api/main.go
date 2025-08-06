@@ -1,40 +1,73 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/turahe/master-data-rest-api/configs"
+	"github.com/turahe/master-data-rest-api/internal/adapters/primary/http"
 	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database"
+	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database/gorm"
 	"github.com/turahe/master-data-rest-api/internal/domain/entities"
+	"github.com/turahe/master-data-rest-api/internal/domain/services"
+	"github.com/turahe/master-data-rest-api/pkg/response"
+
+	// Swagger imports
+	_ "github.com/turahe/master-data-rest-api/docs"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using system environment variables")
-	}
+// @title           Master Data REST API
+// @version         1.0
+// @description     A REST API for managing master data including countries, provinces, cities, districts, villages, banks, currencies, and languages.
+// @termsOfService  http://swagger.io/terms/
 
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+
+func main() {
 	// Load configuration
 	config := configs.Load()
 
-	// Initialize database connection
-	dbManager, err := initDatabase(config)
+	// Convert port string to int
+	port, err := strconv.Atoi(config.Database.Port)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Fatal("Invalid database port:", err)
 	}
-	defer dbManager.Close()
 
-	// Run GORM auto-migrations
-	if err := dbManager.AutoMigrate(
+	// Initialize database connection manager
+	dbManager, err := database.NewGORMConnectionManager(&database.Config{
+		Driver:    database.DriverType(config.Database.Driver),
+		Host:      config.Database.Host,
+		Port:      port,
+		Username:  config.Database.User,
+		Password:  config.Database.Password,
+		Database:  config.Database.Name,
+		Charset:   config.Database.Charset,
+		ParseTime: config.Database.ParseTime == "true",
+		Loc:       config.Database.Loc,
+		SSLMode:   config.Database.SSLMode,
+	})
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+
+	// Auto-migrate database schema
+	err = dbManager.AutoMigrate(
 		&entities.Country{},
 		&entities.Province{},
 		&entities.City{},
@@ -43,112 +76,68 @@ func main() {
 		&entities.Bank{},
 		&entities.Currency{},
 		&entities.Language{},
-	); err != nil {
-		log.Fatalf("Failed to run auto-migrations: %v", err)
+	)
+	if err != nil {
+		log.Fatal("Failed to auto-migrate database:", err)
 	}
+
+	// Initialize repositories
+	countryRepo := gorm.NewCountryRepository(dbManager.GetDB())
+
+	// Initialize services
+	countryService := services.NewCountryService(countryRepo)
+
+	// Initialize handlers
+	countryHandler := http.NewCountryHTTPHandler(countryService)
 
 	// Setup router
-	router := setupRouter()
+	router := setupRouter(countryHandler)
 
-	// Get server configuration
-	port := os.Getenv("APP_PORT")
-	if port == "" {
-		port = "8080"
+	// Start server
+	log.Printf("Server starting on port %s", config.Server.Port)
+	if err := router.Run(":" + config.Server.Port); err != nil {
+		log.Fatal("Failed to start server:", err)
 	}
-
-	// Create server
-	srv := &http.Server{
-		Addr:    ":" + port,
-		Handler: router,
-	}
-
-	// Start server in a goroutine
-	go func() {
-		log.Printf("Server starting on port %s", port)
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Failed to start server: %v", err)
-		}
-	}()
-
-	// Wait for interrupt signal to gracefully shutdown the server
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.Println("Shutting down server...")
-
-	// Give outstanding requests a deadline for completion
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown:", err)
-	}
-
-	log.Println("Server exiting")
 }
 
-// initDatabase initializes the GORM database connection
-func initDatabase(config *configs.Config) (*database.GORMConnectionManager, error) {
-	// Create database factory
-	dbFactory := database.NewFactory()
-
-	// Create GORM connection manager
-	dbManager, err := dbFactory.CreateGORMConnectionManager(config)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create GORM connection manager: %w", err)
-	}
-
-	// Set log level based on environment
-	if config.App.Env == "production" {
-		dbManager.SetLogLevel(1) // Error level
-	} else {
-		dbManager.SetLogLevel(4) // Info level
-	}
-
-	return dbManager, nil
-}
-
-// setupRouter configures the HTTP router with middleware and routes
-func setupRouter() *gin.Engine {
-	// Set Gin mode
-	if os.Getenv("APP_ENV") == "production" {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
+func setupRouter(countryHandler *http.CountryHTTPHandler) *gin.Engine {
 	router := gin.Default()
-
-	// Add middleware
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
-	router.Use(corsMiddleware())
 
 	// Health check endpoint
 	router.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "ok",
-			"message": "Server is running",
-			"time":    time.Now().Format(time.RFC3339),
-		})
+		response.Success(c, gin.H{
+			"status": "ok",
+			"time":   "now",
+		}, "Server is running")
 	})
 
-	// API routes will be added here when needed
-	// Example: countries, provinces, cities, etc.
+	// Swagger documentation
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	return router
-}
-
-// corsMiddleware adds CORS headers
-func corsMiddleware() gin.HandlerFunc {
-	return gin.HandlerFunc(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
-			return
+	// API routes
+	api := router.Group("/api/v1")
+	{
+		// Country routes
+		countries := api.Group("/countries")
+		{
+			countries.POST("/", countryHandler.CreateCountry)
+			countries.GET("/", countryHandler.GetAllCountries)
+			countries.GET("/:id", countryHandler.GetCountryByID)
+			countries.GET("/code/:code", countryHandler.GetCountryByCode)
+			countries.GET("/iso3166-2/:iso", countryHandler.GetCountryByISO31662)
+			countries.GET("/iso3166-3/:iso", countryHandler.GetCountryByISO31663)
+			countries.GET("/name/:name", countryHandler.GetCountryByName)
+			countries.GET("/region/:region", countryHandler.GetCountriesByRegion)
+			countries.GET("/subregion/:subregion", countryHandler.GetCountriesBySubRegion)
+			countries.GET("/eea", countryHandler.GetEEACountries)
+			countries.PUT("/:id", countryHandler.UpdateCountry)
+			countries.DELETE("/:id", countryHandler.DeleteCountry)
+			countries.GET("/count", countryHandler.GetCountryCount)
 		}
 
-		c.Next()
-	})
+		// Master data routes will be added here
+		// Example: provinces, cities, etc.
+	}
+
+	return router
 }

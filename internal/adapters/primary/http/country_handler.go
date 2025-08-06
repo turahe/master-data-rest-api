@@ -20,6 +20,16 @@ func NewCountryHTTPHandler(countryService *services.CountryService) *CountryHTTP
 }
 
 // CreateCountry handles POST /api/v1/countries
+// @Summary Create a new country
+// @Description Create a new country with the provided information
+// @Tags countries
+// @Accept json
+// @Produce json
+// @Param request body object true "Country information"
+// @Success 201 {object} response.Response{data=entities.Country} "Country created successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Router /api/v1/countries [post]
 func (h *CountryHTTPHandler) CreateCountry(c *gin.Context) {
 	var req struct {
 		CountryCode     string  `json:"country_code" binding:"required"`
@@ -88,6 +98,17 @@ func (h *CountryHTTPHandler) CreateCountry(c *gin.Context) {
 }
 
 // GetCountryByID handles GET /api/v1/countries/:id
+// @Summary Get country by ID
+// @Description Get a country by its UUID
+// @Tags countries
+// @Accept json
+// @Produce json
+// @Param id path string true "Country ID" format(uuid)
+// @Success 200 {object} response.Response{data=entities.Country} "Country found"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 404 {object} response.Response "Country not found"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Router /api/v1/countries/{id} [get]
 func (h *CountryHTTPHandler) GetCountryByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
@@ -98,12 +119,7 @@ func (h *CountryHTTPHandler) GetCountryByID(c *gin.Context) {
 
 	country, err := h.countryService.GetCountryByID(id)
 	if err != nil {
-		response.InternalServerError(c, "Failed to get country: "+err.Error())
-		return
-	}
-
-	if country == nil {
-		response.NotFound(c, "Country not found")
+		response.NotFound(c, "Country not found: "+err.Error())
 		return
 	}
 

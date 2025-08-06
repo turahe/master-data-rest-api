@@ -56,6 +56,7 @@ coverage.html
 # Database files
 *.db
 *.sqlite
+data/
 
 # Docker
 .dockerignore

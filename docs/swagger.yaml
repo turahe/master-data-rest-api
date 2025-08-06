@@ -1,0 +1,153 @@
+basePath: /api/v1
+definitions:
+  entities.Country:
+    properties:
+      calling_code:
+        type: string
+      capital:
+        type: string
+      citizenship:
+        type: string
+      country_code:
+        type: string
+      created_at:
+        type: string
+      currency_code:
+        type: string
+      currency_name:
+        type: string
+      currency_sub_unit:
+        type: string
+      currency_symbol:
+        type: string
+      eea:
+        type: boolean
+      flag:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      iso_3166_2:
+        type: string
+      iso_3166_3:
+        type: string
+      latitude:
+        type: string
+      longitude:
+        type: string
+      name:
+        type: string
+      region_code:
+        type: string
+      sub_region_code:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      error:
+        type: string
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: A REST API for managing master data including countries, provinces,
+    cities, districts, villages, banks, currencies, and languages.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Master Data REST API
+  version: "1.0"
+paths:
+  /api/v1/countries:
+    post:
+      consumes:
+      - application/json
+      description: Create a new country with the provided information
+      parameters:
+      - description: Country information
+        in: body
+        name: request
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Country created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.Country'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Create a new country
+      tags:
+      - countries
+  /api/v1/countries/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a country by its UUID
+      parameters:
+      - description: Country ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Country found
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.Country'
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Country not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get country by ID
+      tags:
+      - countries
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/google/uuid"
 	"github.com/turahe/master-data-rest-api/internal/domain/entities"
 	"github.com/turahe/master-data-rest-api/internal/domain/repositories"
 )
@@ -29,7 +30,7 @@ func (s *BankService) CreateBank(name, alias, company, code string) (*entities.B
 }
 
 // GetBankByID retrieves a bank by ID
-func (s *BankService) GetBankByID(id uint) (*entities.Bank, error) {
+func (s *BankService) GetBankByID(id uuid.UUID) (*entities.Bank, error) {
 	return s.bankRepo.GetByID(id)
 }
 
@@ -38,13 +39,13 @@ func (s *BankService) GetBankByCode(code string) (*entities.Bank, error) {
 	return s.bankRepo.GetByCode(code)
 }
 
-// GetBankByName retrieves a bank by name
-func (s *BankService) GetBankByName(name string) (*entities.Bank, error) {
+// GetBankByName retrieves banks by name
+func (s *BankService) GetBankByName(name string) ([]*entities.Bank, error) {
 	return s.bankRepo.GetByName(name)
 }
 
-// GetBankByAlias retrieves a bank by alias
-func (s *BankService) GetBankByAlias(alias string) (*entities.Bank, error) {
+// GetBankByAlias retrieves banks by alias
+func (s *BankService) GetBankByAlias(alias string) ([]*entities.Bank, error) {
 	return s.bankRepo.GetByAlias(alias)
 }
 
@@ -64,12 +65,12 @@ func (s *BankService) UpdateBank(bank *entities.Bank) error {
 }
 
 // DeleteBank deletes a bank by ID
-func (s *BankService) DeleteBank(id uint) error {
+func (s *BankService) DeleteBank(id uuid.UUID) error {
 	return s.bankRepo.Delete(id)
 }
 
 // BankExists checks if a bank exists by ID
-func (s *BankService) BankExists(id uint) (bool, error) {
+func (s *BankService) BankExists(id uuid.UUID) (bool, error) {
 	return s.bankRepo.Exists(id)
 }
 
