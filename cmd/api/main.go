@@ -14,9 +14,9 @@ import (
 	"github.com/turahe/master-data-rest-api/pkg/response"
 
 	// Swagger imports
-	_ "github.com/turahe/master-data-rest-api/docs"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "github.com/turahe/master-data-rest-api/docs"
 )
 
 // @title           Master Data REST API
@@ -83,15 +83,45 @@ func main() {
 
 	// Initialize repositories
 	countryRepo := gorm.NewCountryRepository(dbManager.GetDB())
+	provinceRepo := gorm.NewProvinceRepository(dbManager.GetDB())
+	cityRepo := gorm.NewCityRepository(dbManager.GetDB())
+	districtRepo := gorm.NewDistrictRepository(dbManager.GetDB())
+	villageRepo := gorm.NewVillageRepository(dbManager.GetDB())
+	bankRepo := gorm.NewBankRepository(dbManager.GetDB())
+	currencyRepo := gorm.NewCurrencyRepository(dbManager.GetDB())
+	languageRepo := gorm.NewLanguageRepository(dbManager.GetDB())
 
 	// Initialize services
 	countryService := services.NewCountryService(countryRepo)
+	provinceService := services.NewProvinceService(provinceRepo)
+	cityService := services.NewCityService(cityRepo)
+	districtService := services.NewDistrictService(districtRepo)
+	villageService := services.NewVillageService(villageRepo)
+	bankService := services.NewBankService(bankRepo)
+	currencyService := services.NewCurrencyService(currencyRepo)
+	languageService := services.NewLanguageService(languageRepo)
 
 	// Initialize handlers
 	countryHandler := http.NewCountryHTTPHandler(countryService)
+	provinceHandler := http.NewProvinceHTTPHandler(provinceService)
+	cityHandler := http.NewCityHTTPHandler(cityService)
+	districtHandler := http.NewDistrictHTTPHandler(districtService)
+	villageHandler := http.NewVillageHTTPHandler(villageService)
+	bankHandler := http.NewBankHTTPHandler(bankService)
+	currencyHandler := http.NewCurrencyHTTPHandler(currencyService)
+	languageHandler := http.NewLanguageHTTPHandler(languageService)
 
 	// Setup router
-	router := setupRouter(countryHandler)
+	router := setupRouter(
+		countryHandler,
+		provinceHandler,
+		cityHandler,
+		districtHandler,
+		villageHandler,
+		bankHandler,
+		currencyHandler,
+		languageHandler,
+	)
 
 	// Start server
 	log.Printf("Server starting on port %s", config.Server.Port)
@@ -100,7 +130,16 @@ func main() {
 	}
 }
 
-func setupRouter(countryHandler *http.CountryHTTPHandler) *gin.Engine {
+func setupRouter(
+	countryHandler *http.CountryHTTPHandler,
+	provinceHandler *http.ProvinceHTTPHandler,
+	cityHandler *http.CityHTTPHandler,
+	districtHandler *http.DistrictHTTPHandler,
+	villageHandler *http.VillageHTTPHandler,
+	bankHandler *http.BankHTTPHandler,
+	currencyHandler *http.CurrencyHTTPHandler,
+	languageHandler *http.LanguageHTTPHandler,
+) *gin.Engine {
 	router := gin.Default()
 
 	// Health check endpoint
@@ -135,8 +174,51 @@ func setupRouter(countryHandler *http.CountryHTTPHandler) *gin.Engine {
 			countries.GET("/count", countryHandler.GetCountryCount)
 		}
 
+		// Province routes
+		provinces := api.Group("/provinces")
+		{
+			provinces.POST("/", provinceHandler.CreateProvince)
+			provinces.GET("/", provinceHandler.GetAllProvinces)
+			provinces.GET("/:id", provinceHandler.GetProvinceByID)
+			provinces.GET("/code/:code", provinceHandler.GetProvinceByCode)
+			provinces.GET("/name/:name", provinceHandler.GetProvinceByName)
+			provinces.GET("/country/:country_id", provinceHandler.GetProvincesByCountry)
+			provinces.PUT("/:id", provinceHandler.UpdateProvince)
+			provinces.DELETE("/:id", provinceHandler.DeleteProvince)
+			provinces.GET("/count", provinceHandler.GetProvinceCount)
+		}
+
+		// City routes
+		cities := api.Group("/cities")
+		{
+			cities.POST("/", cityHandler.CreateCity)
+			cities.GET("/", cityHandler.GetAllCities)
+			cities.GET("/:id", cityHandler.GetCityByID)
+			cities.GET("/code/:code", cityHandler.GetCityByCode)
+			cities.GET("/name/:name", cityHandler.GetCityByName)
+			cities.GET("/province/:province_id", cityHandler.GetCitiesByProvince)
+			cities.PUT("/:id", cityHandler.UpdateCity)
+			cities.DELETE("/:id", cityHandler.DeleteCity)
+			cities.GET("/count", cityHandler.GetCityCount)
+		}
+
+		// Bank routes
+		banks := api.Group("/banks")
+		{
+			banks.POST("/", bankHandler.CreateBank)
+			banks.GET("/", bankHandler.GetAllBanks)
+			banks.GET("/:id", bankHandler.GetBankByID)
+			banks.GET("/code/:code", bankHandler.GetBankByCode)
+			banks.GET("/name/:name", bankHandler.GetBankByName)
+			banks.GET("/alias/:alias", bankHandler.GetBankByAlias)
+			banks.GET("/company/:company", bankHandler.GetBanksByCompany)
+			banks.PUT("/:id", bankHandler.UpdateBank)
+			banks.DELETE("/:id", bankHandler.DeleteBank)
+			banks.GET("/count", bankHandler.GetBankCount)
+		}
+
 		// Master data routes will be added here
-		// Example: provinces, cities, etc.
+		// Example: districts, villages, currencies, languages, etc.
 	}
 
 	return router
