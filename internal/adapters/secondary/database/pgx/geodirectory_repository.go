@@ -32,7 +32,7 @@ func (r *GeodirectoryRepository) Create(ctx context.Context, geodirectory *entit
 func (r *GeodirectoryRepository) GetByID(ctx context.Context, id uuid.UUID) (*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE id = $1`
 
@@ -42,7 +42,7 @@ func (r *GeodirectoryRepository) GetByID(ctx context.Context, id uuid.UUID) (*en
 	err := row.Scan(
 		&geodirectory.ID, &geodirectory.Name, &geodirectory.Type, &geodirectory.Code,
 		&geodirectory.PostalCode, &geodirectory.Longitude, &geodirectory.Latitude,
-		&geodirectory.RecordLeft, &geodirectory.RecordRight, &geodirectory.RecordOrdering,
+		&geodirectory.RecordLeft, &geodirectory.RecordRight, &geodirectory.RecordOrdering, &geodirectory.RecordDepth,
 		&geodirectory.ParentID, &geodirectory.CreatedAt, &geodirectory.UpdatedAt,
 	)
 
@@ -60,7 +60,7 @@ func (r *GeodirectoryRepository) GetByID(ctx context.Context, id uuid.UUID) (*en
 func (r *GeodirectoryRepository) GetAll(ctx context.Context, limit, offset int) ([]*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		ORDER BY record_ordering, name
 		LIMIT $1 OFFSET $2`
@@ -81,13 +81,13 @@ func (r *GeodirectoryRepository) Update(ctx context.Context, geodirectory *entit
 	query := `
 		UPDATE tm_geodirectories SET
 			name = $2, type = $3, code = $4, postal_code = $5, longitude = $6, latitude = $7,
-			record_left = $8, record_right = $9, record_ordering = $10, parent_id = $11, updated_at = $12
+			record_left = $8, record_right = $9, record_ordering = $10, record_depth = $11, parent_id = $12, updated_at = $13
 		WHERE id = $1`
 
 	result, err := r.pool.Exec(ctx, query,
 		geodirectory.ID, geodirectory.Name, geodirectory.Type, geodirectory.Code,
 		geodirectory.PostalCode, geodirectory.Longitude, geodirectory.Latitude,
-		geodirectory.RecordLeft, geodirectory.RecordRight, geodirectory.RecordOrdering,
+		geodirectory.RecordLeft, geodirectory.RecordRight, geodirectory.RecordOrdering, geodirectory.RecordDepth,
 		geodirectory.ParentID, geodirectory.UpdatedAt,
 	)
 
@@ -120,7 +120,7 @@ func (r *GeodirectoryRepository) Count(ctx context.Context) (int64, error) {
 func (r *GeodirectoryRepository) Search(ctx context.Context, query string, limit, offset int) ([]*entities.Geodirectory, error) {
 	searchQuery := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE name ILIKE $1 OR code ILIKE $1 OR postal_code ILIKE $1
 		ORDER BY name
@@ -140,7 +140,7 @@ func (r *GeodirectoryRepository) Search(ctx context.Context, query string, limit
 func (r *GeodirectoryRepository) GetByName(ctx context.Context, name string) (*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE name = $1`
 
@@ -150,7 +150,7 @@ func (r *GeodirectoryRepository) GetByName(ctx context.Context, name string) (*e
 	err := row.Scan(
 		&geodirectory.ID, &geodirectory.Name, &geodirectory.Type, &geodirectory.Code,
 		&geodirectory.PostalCode, &geodirectory.Longitude, &geodirectory.Latitude,
-		&geodirectory.RecordLeft, &geodirectory.RecordRight, &geodirectory.RecordOrdering,
+		&geodirectory.RecordLeft, &geodirectory.RecordRight, &geodirectory.RecordOrdering, &geodirectory.RecordDepth,
 		&geodirectory.ParentID, &geodirectory.CreatedAt, &geodirectory.UpdatedAt,
 	)
 
@@ -168,7 +168,7 @@ func (r *GeodirectoryRepository) GetByName(ctx context.Context, name string) (*e
 func (r *GeodirectoryRepository) GetByCode(ctx context.Context, code string) (*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE code = $1`
 
@@ -178,7 +178,7 @@ func (r *GeodirectoryRepository) GetByCode(ctx context.Context, code string) (*e
 	err := row.Scan(
 		&geodirectory.ID, &geodirectory.Name, &geodirectory.Type, &geodirectory.Code,
 		&geodirectory.PostalCode, &geodirectory.Longitude, &geodirectory.Latitude,
-		&geodirectory.RecordLeft, &geodirectory.RecordRight, &geodirectory.RecordOrdering,
+		&geodirectory.RecordLeft, &geodirectory.RecordRight, &geodirectory.RecordOrdering, &geodirectory.RecordDepth,
 		&geodirectory.ParentID, &geodirectory.CreatedAt, &geodirectory.UpdatedAt,
 	)
 
@@ -196,7 +196,7 @@ func (r *GeodirectoryRepository) GetByCode(ctx context.Context, code string) (*e
 func (r *GeodirectoryRepository) GetByPostalCode(ctx context.Context, postalCode string) ([]*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE postal_code = $1
 		ORDER BY name`
@@ -214,7 +214,7 @@ func (r *GeodirectoryRepository) GetByPostalCode(ctx context.Context, postalCode
 func (r *GeodirectoryRepository) GetByType(ctx context.Context, geoType entities.GeoType, limit, offset int) ([]*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE type = $1
 		ORDER BY name
@@ -258,7 +258,7 @@ func (r *GeodirectoryRepository) GetVillages(ctx context.Context, limit, offset 
 func (r *GeodirectoryRepository) GetChildren(ctx context.Context, parentID uuid.UUID, limit, offset int) ([]*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE parent_id = $1
 		ORDER BY record_ordering, name
@@ -277,7 +277,7 @@ func (r *GeodirectoryRepository) GetChildren(ctx context.Context, parentID uuid.
 func (r *GeodirectoryRepository) GetChildrenByType(ctx context.Context, parentID uuid.UUID, geoType entities.GeoType, limit, offset int) ([]*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE parent_id = $1 AND type = $2
 		ORDER BY record_ordering, name
@@ -296,7 +296,7 @@ func (r *GeodirectoryRepository) GetChildrenByType(ctx context.Context, parentID
 func (r *GeodirectoryRepository) GetCountryByCode(ctx context.Context, code string) (*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE code = $1 AND type = 'COUNTRY'`
 
@@ -306,7 +306,7 @@ func (r *GeodirectoryRepository) GetCountryByCode(ctx context.Context, code stri
 	err := row.Scan(
 		&geodirectory.ID, &geodirectory.Name, &geodirectory.Type, &geodirectory.Code,
 		&geodirectory.PostalCode, &geodirectory.Longitude, &geodirectory.Latitude,
-		&geodirectory.RecordLeft, &geodirectory.RecordRight, &geodirectory.RecordOrdering,
+		&geodirectory.RecordLeft, &geodirectory.RecordRight, &geodirectory.RecordOrdering, &geodirectory.RecordDepth,
 		&geodirectory.ParentID, &geodirectory.CreatedAt, &geodirectory.UpdatedAt,
 	)
 
@@ -382,7 +382,7 @@ func (r *GeodirectoryRepository) GetParent(ctx context.Context, id uuid.UUID) (*
 	err := row.Scan(
 		&parent.ID, &parent.Name, &parent.Type, &parent.Code,
 		&parent.PostalCode, &parent.Longitude, &parent.Latitude,
-		&parent.RecordLeft, &parent.RecordRight, &parent.RecordOrdering,
+		&parent.RecordLeft, &parent.RecordRight, &parent.RecordOrdering, &parent.RecordDepth,
 		&parent.ParentID, &parent.CreatedAt, &parent.UpdatedAt,
 	)
 
@@ -461,7 +461,7 @@ func (r *GeodirectoryRepository) GetSiblings(ctx context.Context, id uuid.UUID, 
 func (r *GeodirectoryRepository) GetByNestedSetRange(ctx context.Context, left, right int, limit, offset int) ([]*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE record_left >= $1 AND record_right <= $2
 		ORDER BY record_left
@@ -547,15 +547,15 @@ func (r *GeodirectoryRepository) InsertNode(ctx context.Context, geodirectory *e
 	query := `
 		INSERT INTO tm_geodirectories (
 			id, name, type, code, postal_code, longitude, latitude,
-			record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
 		)`
 
 	_, err = tx.Exec(ctx, query,
 		geodirectory.ID, geodirectory.Name, geodirectory.Type, geodirectory.Code,
 		geodirectory.PostalCode, geodirectory.Longitude, geodirectory.Latitude,
-		geodirectory.RecordLeft, geodirectory.RecordRight, geodirectory.RecordOrdering,
+		geodirectory.RecordLeft, geodirectory.RecordRight, geodirectory.RecordOrdering, geodirectory.RecordDepth,
 		geodirectory.ParentID, geodirectory.CreatedAt, geodirectory.UpdatedAt,
 	)
 
@@ -771,7 +771,7 @@ func (r *GeodirectoryRepository) GetByCoordinates(ctx context.Context, latitude,
 	// For now, return a simple string-based match
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE latitude = $1 AND longitude = $2
 		ORDER BY name`
@@ -795,7 +795,7 @@ func (r *GeodirectoryRepository) GetNearby(ctx context.Context, id uuid.UUID, ra
 func (r *GeodirectoryRepository) GetRoots(ctx context.Context, limit, offset int) ([]*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE parent_id IS NULL
 		ORDER BY record_ordering, name
@@ -813,7 +813,7 @@ func (r *GeodirectoryRepository) GetRoots(ctx context.Context, limit, offset int
 func (r *GeodirectoryRepository) GetLeaves(ctx context.Context, limit, offset int) ([]*entities.Geodirectory, error) {
 	query := `
 		SELECT id, name, type, code, postal_code, longitude, latitude,
-			   record_left, record_right, record_ordering, parent_id, created_at, updated_at
+			   record_left, record_right, record_ordering, record_depth, parent_id, created_at, updated_at
 		FROM tm_geodirectories
 		WHERE record_right - record_left = 1
 		ORDER BY record_ordering, name
@@ -837,7 +837,7 @@ func (r *GeodirectoryRepository) scanGeodirectories(rows pgx.Rows) ([]*entities.
 		err := rows.Scan(
 			&geodirectory.ID, &geodirectory.Name, &geodirectory.Type, &geodirectory.Code,
 			&geodirectory.PostalCode, &geodirectory.Longitude, &geodirectory.Latitude,
-			&geodirectory.RecordLeft, &geodirectory.RecordRight, &geodirectory.RecordOrdering,
+			&geodirectory.RecordLeft, &geodirectory.RecordRight, &geodirectory.RecordOrdering, &geodirectory.RecordDepth,
 			&geodirectory.ParentID, &geodirectory.CreatedAt, &geodirectory.UpdatedAt,
 		)
 		if err != nil {

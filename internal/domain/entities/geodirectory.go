@@ -34,6 +34,7 @@ type Geodirectory struct {
 	RecordLeft     *int       `json:"record_left,omitempty" db:"record_left"`
 	RecordRight    *int       `json:"record_right,omitempty" db:"record_right"`
 	RecordOrdering *int       `json:"record_ordering,omitempty" db:"record_ordering"`
+	RecordDepth    *int       `json:"record_depth,omitempty" db:"record_depth"`
 	ParentID       *uuid.UUID `json:"parent_id,omitempty" db:"parent_id"`
 	CreatedAt      time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt      time.Time  `json:"updated_at" db:"updated_at"`
@@ -97,6 +98,44 @@ func (g *Geodirectory) SetNestedSetValues(left, right, ordering int) {
 	g.RecordRight = &right
 	g.RecordOrdering = &ordering
 	g.UpdatedAt = time.Now()
+}
+
+// SetDepth sets the hierarchical depth for the geodirectory
+func (g *Geodirectory) SetDepth(depth int) {
+	g.RecordDepth = &depth
+	g.UpdatedAt = time.Now()
+}
+
+// SetOrderingID sets the record_ordering as a sortable identifier
+func (g *Geodirectory) SetOrderingID(orderingID int) {
+	g.RecordOrdering = &orderingID
+	g.UpdatedAt = time.Now()
+}
+
+// GetDepthForType returns the appropriate depth based on geodirectory type
+func (g *Geodirectory) GetDepthForType() int {
+	switch g.Type {
+	case GeoTypeContinent:
+		return 1
+	case GeoTypeSubcontinent:
+		return 2
+	case GeoTypeCountry:
+		return 3
+	case GeoTypeState, GeoTypeProvince:
+		return 4
+	case GeoTypeRegency:
+		return 5
+	case GeoTypeCity:
+		return 6
+	case GeoTypeDistrict:
+		return 7
+	case GeoTypeSubdistrict:
+		return 8
+	case GeoTypeVillage:
+		return 9
+	default:
+		return 0
+	}
 }
 
 // IsLeaf checks if this geodirectory is a leaf node (has no children)
