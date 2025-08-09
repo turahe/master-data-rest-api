@@ -10,7 +10,7 @@ A modern, high-performance REST API built with **Go** and **Hexagonal Architectu
 ## ✨ Key Features
 
 - 🏗️ **Hexagonal Architecture** - Clean separation of concerns with ports & adapters
-- 🌍 **Geographical Data Management** - Nested set model for hierarchical data (continents → countries → provinces → cities → districts → villages)
+- 🌍 **Geographical Data Management** - Nested set model for hierarchical data (countries → provinces → cities/regencies → districts → villages)
 - 🏦 **Banking Information** - Complete bank master data with search capabilities
 - 💰 **Currency Management** - Multi-currency support with status management
 - 🗣️ **Language Support** - Localization and language information management
@@ -188,12 +188,13 @@ master-data-rest-api/
 │   │   ├── repositories/  # Repository interfaces (ports)
 │   │   ├── services/      # Business services
 │   │   └── valueobjects/  # Value objects
-│   └── adapters/          # 🟡 Adapters Layer
-│       ├── primary/       # Incoming adapters
-│       │   └── http/      # HTTP handlers (Fiber)
-│       └── secondary/     # Outgoing adapters
-│           ├── database/  # Database implementations (pgx)
-│           └── search/    # Search implementations (Meilisearch)
+│   ├── adapters/          # 🟡 Adapters Layer
+│   │   ├── primary/       # Incoming adapters
+│   │   │   └── http/      # HTTP handlers (Fiber)
+│   │   └── secondary/     # Outgoing adapters
+│   │       ├── database/  # Database implementations (pgx)
+│   │       └── search/    # Search implementations (Meilisearch)
+│   └── seeders/           # Data seeding implementations
 ├── pkg/                   # Shared packages
 │   ├── logger/           # Structured logging
 │   └── response/         # HTTP response utilities
@@ -227,6 +228,18 @@ curl -H "Authorization: Bearer YOUR_API_KEY" \
 - `GET /api/v1/geodirectories/{id}/hierarchy` - Get with hierarchy
 - `POST /api/v1/geodirectories/{id}/move` - Move to new parent
 - `POST /api/v1/geodirectories/rebuild` - Rebuild nested set
+
+#### Geographic Hierarchy
+The system supports a nested geographic structure with automatic type classification:
+- **Countries** (Level 2) - All geodirectories are children of Indonesia
+- **Provinces** (Level 4) - Indonesian provinces
+- **Cities/Regencies** (Level 6) - Automatically classified by name prefix:
+  - Names starting with `KOTA` → City type
+  - Names starting with `KAB` → Regency type
+- **Districts** (Level 7) - Sub-divisions of cities/regencies
+- **Villages** (Level 9) - Smallest administrative units
+
+The nested set model enables efficient hierarchical queries and maintains referential integrity.
 
 ### 🏦 Banks
 - `GET /api/v1/banks` - List all banks
@@ -319,10 +332,40 @@ The application features a modern CLI built with Cobra:
 
 # Seed specific data type
 ./master-data-api seed --name languages
+./master-data-api seed --name banks
+./master-data-api seed --name currencies
+./master-data-api seed --name geodirectories
 
-# Clear and reseed
+# TRUNCATE existing data and seed fresh (fast bulk deletion)
 ./master-data-api seed --clear
+
+# Seed specific data with TRUNCATE
+./master-data-api seed --name languages --clear
+
+# Seed from custom data directory
+./master-data-api seed --data-dir ./custom-data
+
+# Only seed without clearing
+./master-data-api seed --seed-only
 ```
+
+#### Seeding Performance Features
+- **🚀 TRUNCATE Operations**: Uses `TRUNCATE TABLE` instead of `DELETE` for efficient bulk data clearing
+- **📊 Progress Tracking**: Real-time progress logging during data seeding
+- **🔄 Upsert Logic**: Prevents duplicate records by checking existing data
+- **🎯 Selective Seeding**: Seed specific data types with `--name` flag
+- **📁 Custom Data Sources**: Support for custom data directories
+
+#### Available Seed Data
+- **Languages** (185 records) - ISO language codes with names from `configs/data/tm_languages.csv`
+- **Banks** (142 records) - Indonesian bank master data from `configs/data/tm_banks.csv`
+- **Currencies** (168 records) - World currencies with symbols from `configs/data/tm_currencies.csv`
+- **Countries** (247 records) - World countries from `configs/data/geodirectories/countries.csv`
+- **Geodirectories** - Indonesian administrative hierarchy:
+  - Provinces from `configs/data/geodirectories/provinces/provinsi.json`
+  - Cities/Regencies from `configs/data/geodirectories/cities/kab-*.json`
+  - Districts from `configs/data/geodirectories/districts/kec-*.json`
+  - Villages from `configs/data/geodirectories/villages/kel-*.json`
 
 ### Search Index Management
 ```bash
@@ -410,10 +453,15 @@ make install-tools
 air
 
 # Run tests
-make test
-make test-coverage
-make test-short  # Faster tests
-make test-clean  # Clean test cache
+make test              # Run all tests
+make test-coverage     # Run tests with coverage report
+make test-short        # Run tests excluding slow ones
+make test-clean        # Clean test cache and temporary files
+
+# Unit tests by component
+go test ./internal/domain/entities/...     # Entity tests
+go test ./internal/domain/services/...     # Service tests
+go test ./pkg/...                          # Package tests
 
 # See docs/testing.md for detailed testing guide
 
