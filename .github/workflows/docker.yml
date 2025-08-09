@@ -58,9 +58,7 @@ jobs:
         context: .
         platforms: linux/amd64
         push: false
-        tags: |
-          master-data-api:test
-          ${{ steps.meta.outputs.tags }}
+        tags: master-data-api:test
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -115,7 +113,10 @@ jobs:
         path: /tmp
 
     - name: Load Docker image
-      run: docker load --input /tmp/image.tar
+      run: |
+        docker load --input /tmp/image.tar
+        echo "Available images after load:"
+        docker images
 
     - name: Test Docker image - Version
       run: |
