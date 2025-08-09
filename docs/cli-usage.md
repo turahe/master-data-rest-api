@@ -69,7 +69,7 @@ master-data-api migrate up --migrations-dir ./custom-migrations
 
 #### Database Seeding
 ```bash
-# Seed database with sample data
+# Seed database with sample data (uses configs/data by default)
 master-data-api seed
 
 # Clear existing data and seed fresh
@@ -81,6 +81,11 @@ master-data-api seed --data-dir ./custom-data
 # Only seed without clearing
 master-data-api seed --seed-only
 ```
+
+**Available Flags:**
+- `--data-dir, -d`: Directory containing seed data files (default: `configs/data`)
+- `--clear, -c`: Clear existing data before seeding (default: `false`)
+- `--seed-only`: Only seed data, don't clear existing data (default: `false`)
 
 ### 🔑 API Key Management
 

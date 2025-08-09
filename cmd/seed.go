@@ -54,7 +54,7 @@ func init() {
 	rootCmd.AddCommand(seedCmd)
 
 	// Seeder flags
-	seedCmd.Flags().StringVarP(&dataDir, "data-dir", "d", "./data", "directory containing seed data files")
+	seedCmd.Flags().StringVarP(&dataDir, "data-dir", "d", "configs/data", "directory containing seed data files")
 	seedCmd.Flags().BoolVarP(&clearData, "clear", "c", false, "clear existing data before seeding")
 	seedCmd.Flags().BoolVar(&seedOnly, "seed-only", false, "only seed data, don't clear existing data")
 }

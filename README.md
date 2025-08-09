@@ -200,6 +200,7 @@ master-data-rest-api/
 ├── docs/                  # 📚 Documentation
 ├── migrations/           # Database migrations
 ├── configs/              # Configuration
+│   └── data/            # Seed data files (CSV/JSON)
 └── scripts/              # Build scripts
 ```
 
