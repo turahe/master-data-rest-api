@@ -11,10 +11,11 @@ import (
 	"github.com/turahe/master-data-rest-api/internal/domain/entities"
 )
 
-// seedCities seeds city data from cities/kab-*.json files
+// seedCities seeds city and regency data from cities/kab-*.json files
+// Names with "KAB " prefix are treated as regencies, "KOTA " prefix as cities
 func (gs *GeodirectorySeeder) seedCities(ctx context.Context, geoDir string) error {
 	citiesDir := filepath.Join(geoDir, "cities")
-	gs.logger.WithField("directory", citiesDir).Info("Seeding cities")
+	gs.logger.WithField("directory", citiesDir).Info("Seeding cities and regencies")
 
 	files, err := filepath.Glob(filepath.Join(citiesDir, "kab-*.json"))
 	if err != nil {
@@ -32,7 +33,7 @@ func (gs *GeodirectorySeeder) seedCities(ctx context.Context, geoDir string) err
 		// Get parent province
 		parent, err := gs.repo.GetByCode(ctx, provinceCode)
 		if err != nil {
-			gs.logger.WithError(err).WithField("province_code", provinceCode).Warn("Failed to find parent province for cities")
+			gs.logger.WithError(err).WithField("province_code", provinceCode).Warn("Failed to find parent province for cities/regencies")
 			continue
 		}
 
@@ -65,26 +66,38 @@ func (gs *GeodirectorySeeder) seedCities(ctx context.Context, geoDir string) err
 				continue
 			}
 
+			// Determine the geo type based on name prefix
+			var geoType entities.GeoType
+			if strings.HasPrefix(strings.ToUpper(name), "KAB ") {
+				geoType = entities.GeoTypeRegency
+			} else if strings.HasPrefix(strings.ToUpper(name), "KOTA ") {
+				geoType = entities.GeoTypeCity
+			} else {
+				// Default to city if no prefix
+				geoType = entities.GeoTypeCity
+			}
+
 			if existing != nil {
-				// Update existing city
+				// Update existing city/regency
 				existing.Name = name
+				existing.Type = geoType
 				existing.SetDepth(existing.GetDepthForType())
 				existing.SetOrderingID(orderingCounter)
 				if updateErr := gs.repo.Update(ctx, existing); updateErr != nil {
-					gs.logger.WithError(updateErr).WithField("code", fullCode).Error("Failed to update city")
+					gs.logger.WithError(updateErr).WithField("code", fullCode).Error("Failed to update city/regency")
 					errorCount++
 					continue
 				}
 			} else {
-				// Create new city
-				city := entities.NewGeodirectory(name, entities.GeoTypeCity)
-				city.SetCode(fullCode)
-				city.SetParent(parent.ID)
-				city.SetDepth(city.GetDepthForType())
-				city.SetOrderingID(orderingCounter)
+				// Create new city/regency
+				geodirectory := entities.NewGeodirectory(name, geoType)
+				geodirectory.SetCode(fullCode)
+				geodirectory.SetParent(parent.ID)
+				geodirectory.SetDepth(geodirectory.GetDepthForType())
+				geodirectory.SetOrderingID(orderingCounter)
 
-				if createErr := gs.repo.Create(ctx, city); createErr != nil {
-					gs.logger.WithError(createErr).WithField("code", fullCode).Error("Failed to create city")
+				if createErr := gs.repo.Create(ctx, geodirectory); createErr != nil {
+					gs.logger.WithError(createErr).WithField("code", fullCode).Error("Failed to create city/regency")
 					errorCount++
 					continue
 				}
@@ -101,14 +114,14 @@ func (gs *GeodirectorySeeder) seedCities(ctx context.Context, geoDir string) err
 			"processed":     successCount + errorCount,
 			"successful":    successCount,
 			"errors":        errorCount,
-		}).Info("City seeding progress for province")
+		}).Info("City/regency seeding progress for province")
 	}
 
 	gs.logger.WithFields(map[string]interface{}{
 		"total_processed": totalSuccess + totalErrors,
 		"successful":      totalSuccess,
 		"errors":          totalErrors,
-	}).Info("City seeding completed")
+	}).Info("City/regency seeding completed")
 
 	return nil
 }

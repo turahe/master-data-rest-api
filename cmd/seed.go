@@ -29,8 +29,8 @@ This command can populate the database with initial data for:
 - Currency data
 - Language information
 
-The seeder supports various options for clearing existing data
-and specifying custom data directories.
+The seeder supports various options for clearing existing data using TRUNCATE
+(for fast bulk deletion) and specifying custom data directories.
 
 Examples:
   # Seed with default data
@@ -42,7 +42,7 @@ Examples:
   master-data-api seed --name currencies
   master-data-api seed --name geodirectories
 
-  # Clear existing data and seed fresh
+  # TRUNCATE existing data and seed fresh (fast bulk deletion)
   master-data-api seed --clear
 
   # Seed from custom data directory
@@ -64,7 +64,7 @@ func init() {
 
 	// Seeder flags
 	seedCmd.Flags().StringVarP(&dataDir, "data-dir", "d", "configs/data", "directory containing seed data files")
-	seedCmd.Flags().BoolVarP(&clearData, "clear", "c", false, "clear existing data before seeding")
+	seedCmd.Flags().BoolVarP(&clearData, "clear", "c", false, "TRUNCATE existing data before seeding (fast bulk deletion)")
 	seedCmd.Flags().BoolVar(&seedOnly, "seed-only", false, "only seed data, don't clear existing data")
 	seedCmd.Flags().StringVarP(&seedName, "name", "n", "", "seed specific data type (languages, banks, currencies, geodirectories)")
 }
@@ -124,14 +124,14 @@ func runSeeder() error {
 		"Geodirectory", "Bank", "Currency", "Language",
 	}).Info("All repositories initialized with pgx driver")
 
-	// Clear data if requested
+	// Clear data if requested using TRUNCATE for efficient bulk deletion
 	if clearData && !seedOnly {
-		log.Info("Clearing existing data")
+		log.Info("Clearing existing data using TRUNCATE")
 		if err := seederManager.Clear(ctx, seedName); err != nil {
-			log.WithError(err).Error("Failed to clear data")
-			return fmt.Errorf("failed to clear data: %w", err)
+			log.WithError(err).Error("Failed to clear data using TRUNCATE")
+			return fmt.Errorf("failed to clear data using TRUNCATE: %w", err)
 		}
-		log.Info("Data cleared successfully")
+		log.Info("Data cleared successfully using TRUNCATE")
 	}
 
 	// Perform seeding
@@ -142,7 +142,7 @@ func runSeeder() error {
 	}
 
 	fmt.Printf("📁 Data directory: %s\n", dataDir)
-	fmt.Printf("🗑️  Clear data: %v\n", clearData)
+	fmt.Printf("🗑️  TRUNCATE data: %v\n", clearData)
 	if seedName != "" {
 		fmt.Printf("🎯 Seeded: %s\n", seedName)
 	} else {
