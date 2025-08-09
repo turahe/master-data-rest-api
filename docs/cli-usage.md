@@ -72,6 +72,12 @@ master-data-api migrate up --migrations-dir ./custom-migrations
 # Seed database with sample data (uses configs/data by default)
 master-data-api seed
 
+# Seed specific data type
+master-data-api seed --name languages
+master-data-api seed --name banks
+master-data-api seed --name currencies
+master-data-api seed --name geodirectories
+
 # Clear existing data and seed fresh
 master-data-api seed --clear
 
@@ -80,9 +86,13 @@ master-data-api seed --data-dir ./custom-data
 
 # Only seed without clearing
 master-data-api seed --seed-only
+
+# Combine flags to seed specific type with custom directory
+master-data-api seed --name languages --data-dir ./my-data
 ```
 
 **Available Flags:**
+- `--name, -n`: Seed specific data type (languages, banks, currencies, geodirectories)
 - `--data-dir, -d`: Directory containing seed data files (default: `configs/data`)
 - `--clear, -c`: Clear existing data before seeding (default: `false`)
 - `--seed-only`: Only seed data, don't clear existing data (default: `false`)

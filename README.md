@@ -314,8 +314,11 @@ The application features a modern CLI built with Cobra:
 
 ### Data Seeding
 ```bash
-# Seed sample data
+# Seed all sample data
 ./master-data-api seed
+
+# Seed specific data type
+./master-data-api seed --name languages
 
 # Clear and reseed
 ./master-data-api seed --clear
