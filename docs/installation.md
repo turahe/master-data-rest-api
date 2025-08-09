@@ -48,6 +48,20 @@ This guide provides detailed installation instructions for the Master Data REST 
 
 ### Optional Software
 - **Docker & Docker Compose** (for containerized deployment)
+- **Meilisearch 1.5+** (for fast search functionality)
+  ```bash
+  # Install Meilisearch
+  # Visit: https://www.meilisearch.com/docs/learn/getting_started/installation
+  
+  # With curl (Linux/macOS)
+  curl -L https://install.meilisearch.com | sh
+  
+  # With Docker
+  docker run -it --rm -p 7700:7700 getmeili/meilisearch:v1.5
+  
+  # With Homebrew (macOS)
+  brew install meilisearch
+  ```
 - **Git** (for source code management)
 - **Make** (for build automation)
 
@@ -195,6 +209,10 @@ This guide provides detailed installation instructions for the Master Data REST 
    LOG_LEVEL=info
    LOG_FORMAT=json
    LOG_OUTPUT=stdout
+   
+   # Search Configuration (Optional - for Meilisearch)
+   MEILISEARCH_HOST=http://localhost:7700
+   MEILISEARCH_API_KEY=masterKey123
    ```
 
 ## 🔧 Initial Setup
@@ -220,7 +238,38 @@ This guide provides detailed installation instructions for the Master Data REST 
 # Save the generated API key - you'll need it for API access
 ```
 
-### 3. Test the Installation
+### 3. Seed Sample Data (Optional)
+
+```bash
+# Seed all sample data using TRUNCATE for efficient bulk operations
+./master-data-api seed --clear
+
+# Or seed specific data types
+./master-data-api seed --name languages
+./master-data-api seed --name banks
+./master-data-api seed --name currencies
+./master-data-api seed --name geodirectories
+```
+
+### 4. Initialize Search Indexes (Optional)
+
+If you're using Meilisearch:
+
+```bash
+# Start Meilisearch (if not using Docker)
+meilisearch --master-key="masterKey123"
+
+# Initialize search indexes
+./master-data-api search init
+
+# Reindex data for search
+./master-data-api search reindex
+
+# Check search health
+./master-data-api search health
+```
+
+### 5. Test the Installation
 
 ```bash
 # Start the server
@@ -232,6 +281,10 @@ curl http://localhost:8080/health
 # Test authenticated endpoint
 curl -H "Authorization: Bearer YOUR_API_KEY" \
      http://localhost:8080/api/v1/geodirectories
+
+# Test search functionality (if Meilisearch is configured)
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+     "http://localhost:8080/api/v1/geodirectories/search?q=jakarta"
 ```
 
 ## 🌍 Platform-Specific Instructions

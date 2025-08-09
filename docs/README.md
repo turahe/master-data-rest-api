@@ -22,6 +22,7 @@ Welcome to the comprehensive documentation for the Master Data REST API. This do
 ### 🔧 Technical Guides
 - [Database Logging](database-logging.md) - Query logging and monitoring
 - [Meilisearch Integration](meilisearch.md) - Search engine setup and usage
+- [Testing Guide](testing.md) - Unit testing with comprehensive coverage
 - [API Authentication](#api-authentication) - Security and access control
 - [Performance Tuning](#performance-tuning) - Optimization guidelines
 
@@ -83,6 +84,12 @@ Welcome to the comprehensive documentation for the Master Data REST API. This do
 # Create API key
 ./master-data-api create-api-key --name "My Key"
 
+# Seed data with TRUNCATE optimization
+./master-data-api seed --clear
+
+# Initialize search indexes
+./master-data-api search init
+
 # Get help for any command
 ./master-data-api [command] --help
 ```
@@ -107,6 +114,9 @@ Welcome to the comprehensive documentation for the Master Data REST API. This do
 - [x] API examples and usage patterns
 - [x] Architecture overview
 - [x] Auto-generated API documentation
+- [x] Meilisearch integration guide
+- [x] Testing guide with unit tests
+- [x] Docker Hub documentation
 
 ### 🚧 Planned Documentation
 - [ ] Performance tuning guide

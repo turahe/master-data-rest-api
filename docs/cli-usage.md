@@ -78,8 +78,11 @@ master-data-api seed --name banks
 master-data-api seed --name currencies
 master-data-api seed --name geodirectories
 
-# Clear existing data and seed fresh
+# TRUNCATE existing data and seed fresh (fast bulk deletion)
 master-data-api seed --clear
+
+# Seed specific data with TRUNCATE
+master-data-api seed --name languages --clear
 
 # Use custom data directory
 master-data-api seed --data-dir ./custom-data
@@ -94,8 +97,25 @@ master-data-api seed --name languages --data-dir ./my-data
 **Available Flags:**
 - `--name, -n`: Seed specific data type (languages, banks, currencies, geodirectories)
 - `--data-dir, -d`: Directory containing seed data files (default: `configs/data`)
-- `--clear, -c`: Clear existing data before seeding (default: `false`)
+- `--clear, -c`: **TRUNCATE** existing data before seeding for efficient bulk deletion (default: `false`)
 - `--seed-only`: Only seed data, don't clear existing data (default: `false`)
+
+**Performance Features:**
+- **🚀 TRUNCATE Operations**: Uses `TRUNCATE TABLE` instead of `DELETE` for fast bulk data clearing
+- **📊 Progress Tracking**: Real-time progress logging during data seeding
+- **🔄 Upsert Logic**: Prevents duplicate records by checking existing data before insertion
+- **📁 Custom Data Sources**: Support for loading data from custom directories
+
+**Available Seed Data:**
+- **Languages** (185 records) - ISO language codes with names
+- **Banks** (142 records) - Indonesian bank master data
+- **Currencies** (168 records) - World currencies with symbols
+- **Countries** (247 records) - World countries  
+- **Geodirectories** - Indonesian administrative hierarchy:
+  - Provinces (34 records)
+  - Cities/Regencies (514 records) - Auto-classified by KOTA/KAB prefix
+  - Districts (7,000+ records)
+  - Villages (83,000+ records)
 
 ### 🔑 API Key Management
 
@@ -117,6 +137,37 @@ master-data-api create-api-key \
   --expires "2024-06-30T23:59:59Z"
 ```
 
+### 🔍 Search Index Management
+
+#### Initialize Search Indexes
+```bash
+# Initialize all search indexes for Meilisearch
+master-data-api search init
+
+# Check initialization status
+master-data-api search health
+```
+
+#### Reindex Data
+```bash
+# Reindex all data to search engine
+master-data-api search reindex
+
+# View indexing statistics
+master-data-api search stats
+```
+
+**Search Commands:**
+- `search init` - Initialize search indexes for all entities
+- `search reindex` - Reindex all data for search functionality
+- `search health` - Check search service connectivity and status
+- `search stats` - Display search index statistics and document counts
+
+**Requirements:**
+- Meilisearch server must be running and accessible
+- Configure `MEILISEARCH_HOST` and `MEILISEARCH_API_KEY` environment variables
+- Ensure database contains data before reindexing
+
 ### 📊 Utility Commands
 
 #### Version Information
@@ -134,6 +185,8 @@ master-data-api --help
 master-data-api serve --help
 master-data-api migrate --help
 master-data-api create-api-key --help
+master-data-api seed --help
+master-data-api search --help
 ```
 
 ## Global Flags
