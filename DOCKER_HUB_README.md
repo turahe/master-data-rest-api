@@ -4,7 +4,7 @@
 [![Docker Image Size](https://img.shields.io/docker/image-size/turahe/master-data-rest-api/latest)](https://hub.docker.com/r/turahe/master-data-rest-api)
 [![Docker Image Version](https://img.shields.io/docker/v/turahe/master-data-rest-api?sort=semver)](https://hub.docker.com/r/turahe/master-data-rest-api)
 
-A high-performance REST API built with Go, Fiber, and PostgreSQL for managing master data including geodirectories, banks, currencies, and languages. Features hexagonal architecture, comprehensive testing, and production-ready containerization.
+A modern, high-performance REST API built with **Go**, **Fiber**, and **PostgreSQL** for managing master data including geographical information, banks, currencies, and languages. Features **hexagonal architecture**, **Meilisearch integration**, **CLI tools**, **TRUNCATE-optimized seeding**, and production-ready containerization.
 
 ## 🚀 Quick Start
 
@@ -31,9 +31,25 @@ docker run -d \
 # Create docker-compose.yml
 curl -O https://raw.githubusercontent.com/turahe/master-data-rest-api/main/docker-compose.yml
 
-# Start all services
+# Start all services (includes PostgreSQL and Meilisearch)
 docker-compose up -d
+
+# Check service status
+docker-compose ps
 ```
+
+## ✨ Key Features
+
+- 🏗️ **Hexagonal Architecture** - Clean separation of concerns with ports & adapters
+- 🌍 **Geographic Hierarchy** - Nested set model for efficient hierarchical queries
+- 🏦 **Master Data Management** - Banks, currencies, languages with comprehensive APIs
+- 🔍 **Meilisearch Integration** - Fast, typo-tolerant search with automatic indexing
+- 🚀 **TRUNCATE Optimization** - Efficient bulk data operations for seeding
+- 🎯 **Modern CLI Tools** - Comprehensive command-line interface with Cobra
+- 📊 **Database Logging** - Query performance monitoring and structured logging
+- 🔐 **API Key Authentication** - Secure access control with Bearer token support
+- 📖 **Auto-Generated Docs** - Swagger/OpenAPI 3.0 compliant documentation
+- 🧪 **Comprehensive Testing** - 100% domain layer coverage with unit tests
 
 ## 📋 Available Tags
 
@@ -60,6 +76,8 @@ docker-compose up -d
 | `APP_ENV` | Environment | `production` | `development`, `staging`, `production` |
 | `LOG_LEVEL` | Log level | `info` | `debug`, `info`, `warn`, `error` |
 | `LOG_FORMAT` | Log format | `json` | `json`, `text` |
+| `MEILISEARCH_HOST` | Meilisearch server URL | `http://localhost:7700` | Meilisearch endpoint |
+| `MEILISEARCH_API_KEY` | Meilisearch API key | `` | Search service key |
 
 ## 🌐 API Endpoints
 
@@ -73,10 +91,11 @@ curl http://localhost:8080/health
 - **OpenAPI JSON**: `http://localhost:8080/swagger/doc.json`
 
 ### Core Endpoints
-- **Geodirectories**: `/api/v1/geodirectories`
-- **Banks**: `/api/v1/banks`
-- **Currencies**: `/api/v1/currencies`
-- **Languages**: `/api/v1/languages`
+- **Geodirectories**: `/api/v1/geodirectories` - Hierarchical geographic data (countries → provinces → cities/regencies → districts → villages)
+- **Banks**: `/api/v1/banks` - Indonesian bank master data with search capabilities
+- **Currencies**: `/api/v1/currencies` - World currencies with symbols and status management
+- **Languages**: `/api/v1/languages` - ISO language codes with localization support
+- **API Keys**: `/api/v1/api-keys` - API key management and authentication
 
 ## 🔐 Authentication
 
@@ -97,6 +116,10 @@ docker run --rm \
 
 Use the API key in requests:
 ```bash
+# Using Authorization Bearer (recommended)
+curl -H "Authorization: Bearer your-api-key" http://localhost:8080/api/v1/banks
+
+# Using X-API-Key header (alternative)
 curl -H "X-API-Key: your-api-key" http://localhost:8080/api/v1/banks
 ```
 
@@ -119,7 +142,17 @@ docker run -d \
   postgres:17
 ```
 
-### 3. Run Database Migrations
+### 3. Start Meilisearch (Optional but Recommended)
+```bash
+docker run -d \
+  --name meilisearch \
+  --network master-data-network \
+  -e MEILI_MASTER_KEY=masterKey123 \
+  -p 7700:7700 \
+  getmeili/meilisearch:v1.5
+```
+
+### 4. Run Database Migrations
 ```bash
 docker run --rm \
   --network master-data-network \
@@ -130,7 +163,7 @@ docker run --rm \
   turahe/master-data-rest-api:latest migrate up
 ```
 
-### 4. Start API Application
+### 5. Start API Application
 ```bash
 docker run -d \
   --name master-data-api \
@@ -140,24 +173,95 @@ docker run -d \
   -e DB_USER=appuser \
   -e DB_PASSWORD=apppassword \
   -e DB_NAME=master_data \
+  -e MEILISEARCH_HOST=http://meilisearch:7700 \
+  -e MEILISEARCH_API_KEY=masterKey123 \
   turahe/master-data-rest-api:latest
 ```
 
-### 5. Create API Key
+### 6. Create API Key
 ```bash
-docker exec -it master-data-api ./main create-api-key
+docker exec -it master-data-api ./main create-api-key --name "Docker Setup"
 ```
 
-### 6. Test API
+### 7. Seed Sample Data (Optional)
+```bash
+# Seed all data types using TRUNCATE for efficient bulk operations
+docker exec -it master-data-api ./main seed --clear
+
+# Or seed specific data types
+docker exec -it master-data-api ./main seed --name languages
+docker exec -it master-data-api ./main seed --name banks
+docker exec -it master-data-api ./main seed --name currencies
+docker exec -it master-data-api ./main seed --name geodirectories
+```
+
+### 8. Initialize Search Indexes (Optional)
+```bash
+# Initialize Meilisearch indexes
+docker exec -it master-data-api ./main search init
+
+# Reindex all data for search
+docker exec -it master-data-api ./main search reindex
+```
+
+### 9. Test API
 ```bash
 # Health check
 curl http://localhost:8080/health
 
 # Get banks (with API key)
-curl -H "X-API-Key: your-api-key" http://localhost:8080/api/v1/banks
+curl -H "Authorization: Bearer your-api-key" http://localhost:8080/api/v1/banks
+
+# Search geodirectories
+curl -H "Authorization: Bearer your-api-key" \
+     "http://localhost:8080/api/v1/geodirectories/search?q=jakarta"
+
+# Get Swagger documentation
+curl http://localhost:8080/swagger/index.html
 ```
 
 ## 🛠️ Advanced Usage
+
+### CLI Tools
+The container includes comprehensive CLI tools for database and application management:
+
+```bash
+# Database migrations
+docker exec -it master-data-api ./main migrate up
+docker exec -it master-data-api ./main migrate down --step 2
+docker exec -it master-data-api ./main migrate status
+
+# API key management
+docker exec -it master-data-api ./main create-api-key --name "Production Key"
+docker exec -it master-data-api ./main create-api-key --name "Temp Key" --expires "2024-12-31T23:59:59Z"
+
+# Data seeding with TRUNCATE optimization
+docker exec -it master-data-api ./main seed --clear              # TRUNCATE and seed all
+docker exec -it master-data-api ./main seed --name languages     # Seed languages only
+docker exec -it master-data-api ./main seed --seed-only          # Seed without clearing
+
+# Search management
+docker exec -it master-data-api ./main search init              # Initialize indexes
+docker exec -it master-data-api ./main search reindex          # Reindex all data
+docker exec -it master-data-api ./main search health           # Check search status
+docker exec -it master-data-api ./main search stats            # View statistics
+
+# Application info
+docker exec -it master-data-api ./main version                 # Show version
+docker exec -it master-data-api ./main --help                  # Show help
+```
+
+### Available Seed Data
+When using the `seed` command, the following datasets are available:
+- **Languages** (185 records) - ISO language codes with names
+- **Banks** (142 records) - Indonesian bank master data  
+- **Currencies** (168 records) - World currencies with symbols
+- **Countries** (247 records) - World countries
+- **Geodirectories** - Indonesian administrative hierarchy:
+  - Provinces (34 records)
+  - Cities/Regencies (514 records) - Auto-classified by KOTA/KAB prefix
+  - Districts (7,000+ records)
+  - Villages (83,000+ records)
 
 ### Custom Configuration
 ```bash
@@ -172,6 +276,8 @@ docker run -d \
   -e DB_USER=your-user \
   -e DB_PASSWORD=your-password \
   -e DB_NAME=your-database \
+  -e MEILISEARCH_HOST=http://your-meilisearch:7700 \
+  -e MEILISEARCH_API_KEY=your-search-key \
   turahe/master-data-rest-api:latest
 ```
 
@@ -258,12 +364,16 @@ docker exec -it master-data-api ./main version
 
 ## 🏗️ Architecture
 
-- **Framework**: Go Fiber (high-performance HTTP framework)
-- **Database**: PostgreSQL with pgx driver
-- **Architecture**: Hexagonal (Ports & Adapters)
-- **Authentication**: API Key based
-- **Logging**: Structured logging with Logrus
-- **Testing**: Comprehensive unit tests with testify
+- **Framework**: Go Fiber v2 (high-performance HTTP framework)
+- **Database**: PostgreSQL 13+ with pgx driver for optimal performance
+- **Search Engine**: Meilisearch integration for fast, typo-tolerant search
+- **Architecture**: Hexagonal (Ports & Adapters) for clean separation of concerns
+- **Authentication**: API Key based with Bearer token support
+- **Logging**: Structured logging with Logrus and database query logging
+- **CLI Tools**: Cobra-powered command-line interface
+- **Testing**: Comprehensive unit tests with testify (100% domain layer coverage)
+- **Geographic Data**: Nested set model for hierarchical data with automatic type classification
+- **Performance**: TRUNCATE-optimized seeding for efficient bulk operations
 
 ## 🔄 Updates
 
