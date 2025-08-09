@@ -1,8 +1,12 @@
 # Master Data REST API
 
+🐳 **Docker Hub**: `turahe/master-data-rest-api`  
+🐙 **GitHub Container Registry**: `ghcr.io/turahe/master-data-rest-api`
+
 [![Docker Pulls](https://img.shields.io/docker/pulls/turahe/master-data-rest-api)](https://hub.docker.com/r/turahe/master-data-rest-api)
 [![Docker Image Size](https://img.shields.io/docker/image-size/turahe/master-data-rest-api/latest)](https://hub.docker.com/r/turahe/master-data-rest-api)
 [![Docker Image Version](https://img.shields.io/docker/v/turahe/master-data-rest-api?sort=semver)](https://hub.docker.com/r/turahe/master-data-rest-api)
+[![GHCR](https://img.shields.io/badge/ghcr-container-blue)](https://github.com/turahe/master-data-rest-api/pkgs/container/master-data-rest-api)
 
 A modern, high-performance REST API built with **Go**, **Fiber**, and **PostgreSQL** for managing master data including geographical information, banks, currencies, and languages. Features **hexagonal architecture**, **Meilisearch integration**, **CLI tools**, **TRUNCATE-optimized seeding**, and production-ready containerization.
 
@@ -11,8 +15,11 @@ A modern, high-performance REST API built with **Go**, **Fiber**, and **PostgreS
 ### Pull and Run
 
 ```bash
-# Pull the latest image
+# Pull from Docker Hub
 docker pull turahe/master-data-rest-api:latest
+
+# Or pull from GitHub Container Registry
+docker pull ghcr.io/turahe/master-data-rest-api:latest
 
 # Run with PostgreSQL (requires database)
 docker run -d \

@@ -8,6 +8,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![API Documentation](https://img.shields.io/badge/docs-swagger-green.svg)](http://localhost:8080/swagger/index.html)
 [![Docker Pulls](https://img.shields.io/docker/pulls/turahe/master-data-rest-api)](https://hub.docker.com/r/turahe/master-data-rest-api)
+[![GHCR](https://img.shields.io/badge/ghcr-container-blue)](https://github.com/turahe/master-data-rest-api/pkgs/container/master-data-rest-api)
 [![GitHub release](https://img.shields.io/github/release/turahe/master-data-rest-api.svg)](https://github.com/turahe/master-data-rest-api/releases)
 [![Coverage](https://img.shields.io/codecov/c/github/turahe/master-data-rest-api)](https://codecov.io/gh/turahe/master-data-rest-api)
 
@@ -26,7 +27,7 @@ A modern, high-performance REST API built with **Go** and **Hexagonal Architectu
 - 🚀 **High Performance** - Built with Fiber v2 and pgx for optimal speed
 - 📖 **Auto-Generated Documentation** - Swagger/OpenAPI 3.0 compliant
 - 🔍 **Powered by Meilisearch** - Fast, typo-tolerant search engine integration
-- 🐳 **Docker Ready** - Available on [Docker Hub](https://hub.docker.com/r/turahe/master-data-rest-api)
+- 🐳 **Docker Ready** - Available on [Docker Hub](https://hub.docker.com/r/turahe/master-data-rest-api) and [GitHub Container Registry](https://github.com/turahe/master-data-rest-api/pkgs/container/master-data-rest-api)
 
 ## 📋 Table of Contents
 
@@ -56,8 +57,11 @@ A modern, high-performance REST API built with **Go** and **Hexagonal Architectu
 curl -O https://raw.githubusercontent.com/turahe/master-data-rest-api/main/docker-compose.yml
 docker-compose up -d
 
-# Or pull from Docker Hub directly
+# Or pull from Docker Hub
 docker pull turahe/master-data-rest-api:latest
+
+# Or pull from GitHub Container Registry
+docker pull ghcr.io/turahe/master-data-rest-api:latest
 ```
 
 > 📚 **For detailed Docker instructions**, see our [Docker Hub README](https://hub.docker.com/r/turahe/master-data-rest-api)
@@ -522,6 +526,10 @@ docker run -p 8080:8080 --env-file .env master-data-api
 # Pull from Docker Hub
 docker pull turahe/master-data-rest-api:latest
 docker run -p 8080:8080 --env-file .env turahe/master-data-rest-api:latest
+
+# Or pull from GitHub Container Registry
+docker pull ghcr.io/turahe/master-data-rest-api:latest
+docker run -p 8080:8080 --env-file .env ghcr.io/turahe/master-data-rest-api:latest
 ```
 
 #### Docker Deployment Flow
