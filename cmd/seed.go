@@ -176,9 +176,43 @@ func runSeeder() error {
 }
 
 func clearAllData(geodirectoryRepo *pgx.GeodirectoryRepository, bankRepo *pgx.BankRepository, currencyRepo *pgx.CurrencyRepository, languageRepo *pgx.LanguageRepository) error {
-	// TODO: Implement data clearing logic
-	// This would involve calling repository methods to clear data
-	// For safety, this is left as a TODO to prevent accidental data loss
+	log := GetLogger()
+	ctx := context.Background()
+	
+	log.Warn("Clearing all data from database...")
+	
+	// Clear languages
+	if err := clearLanguagesData(languageRepo, ctx); err != nil {
+		return fmt.Errorf("failed to clear languages: %w", err)
+	}
+	
+	// TODO: Add clearing logic for other data types when their seeders are implemented
+	// Clear banks, currencies, geodirectories...
+	
+	log.Info("All data cleared successfully")
+	return nil
+}
+
+// clearLanguagesData removes all languages from the database
+func clearLanguagesData(languageRepo *pgx.LanguageRepository, ctx context.Context) error {
+	log := GetLogger()
+	
+	// Get all languages first to count them
+	languages, err := languageRepo.GetAll(ctx, 10000, 0) // Get up to 10k records with 0 offset
+	if err != nil {
+		return fmt.Errorf("failed to get languages for clearing: %w", err)
+	}
+	
+	log.WithField("count", len(languages)).Info("Clearing existing languages")
+	
+	for _, language := range languages {
+		if err := languageRepo.Delete(ctx, language.ID); err != nil {
+			log.WithError(err).WithField("id", language.ID).Warn("Failed to delete language")
+			// Continue with others even if one fails
+		}
+	}
+	
+	log.WithField("count", len(languages)).Info("Languages cleared successfully")
 	return nil
 }
 
@@ -237,22 +271,22 @@ func seedLanguages(languageRepo *pgx.LanguageRepository, dataDir string) error {
 		// Create language entity
 		language := entities.NewLanguage(name, code)
 
-		// Create or update language in database
-		err = languageRepo.Create(ctx, language)
-		if err != nil {
-			// Try to update if create fails (might already exist)
-			existing, getErr := languageRepo.GetByCode(ctx, code)
-			if getErr != nil {
+		// Check if language already exists
+		existing, getErr := languageRepo.GetByCode(ctx, code)
+		if getErr != nil {
+			// Language doesn't exist, create new one
+			err = languageRepo.Create(ctx, language)
+			if err != nil {
 				log.WithError(err).WithFields(map[string]interface{}{
 					"row":  i + 2,
 					"code": code,
 					"name": name,
-				}).Warn("Failed to create or find existing language")
+				}).Warn("Failed to create language")
 				errorCount++
 				continue
 			}
-
-			// Update existing language
+		} else {
+			// Language exists, update it
 			existing.SetName(name)
 			updateErr := languageRepo.Update(ctx, existing)
 			if updateErr != nil {
