@@ -19,6 +19,7 @@ A modern, high-performance REST API built with **Go** and **Hexagonal Architectu
 - 📊 **Database Logging** - Comprehensive query logging with performance metrics
 - 🚀 **High Performance** - Built with Fiber v2 and pgx for optimal speed
 - 📖 **Auto-Generated Documentation** - Swagger/OpenAPI 3.0 compliant
+- 🐳 **Docker Ready** - Available on [Docker Hub](https://hub.docker.com/r/turahe/master-data-rest-api)
 
 ## 📋 Table of Contents
 
@@ -40,7 +41,20 @@ A modern, high-performance REST API built with **Go** and **Hexagonal Architectu
 - **PostgreSQL 13+** - [Install PostgreSQL](https://www.postgresql.org/download/)
 - **Docker** (optional) - [Install Docker](https://docs.docker.com/get-docker/)
 
-### Installation
+### Quick Start with Docker (Recommended)
+
+```bash
+# Pull and run with Docker Compose
+curl -O https://raw.githubusercontent.com/turahe/master-data-rest-api/main/docker-compose.yml
+docker-compose up -d
+
+# Or pull from Docker Hub directly
+docker pull turahe/master-data-rest-api:latest
+```
+
+> 📚 **For detailed Docker instructions**, see our [Docker Hub README](https://hub.docker.com/r/turahe/master-data-rest-api)
+
+### Installation from Source
 
 1. **Clone the repository**
    ```bash
