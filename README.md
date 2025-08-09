@@ -95,29 +95,64 @@ A modern, high-performance REST API built with **Go** and **Hexagonal Architectu
 
 This project follows **Hexagonal Architecture** (Ports & Adapters pattern) for maintainable and testable code:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    External World                           │
-├─────────────────────────────────────────────────────────────┤
-│                 Primary Adapters                           │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│  │   HTTP/REST │  │     CLI     │  │   GraphQL   │        │
-│  │   (Fiber)   │  │  (Cobra)    │  │  (Future)   │        │
-│  └─────────────┘  └─────────────┘  └─────────────┘        │
-├─────────────────────────────────────────────────────────────┤
-│                    Domain Layer                             │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │                 Business Logic                      │    │
-│  │  • Entities  • Services  • Value Objects          │    │
-│  │  • Repository Interfaces (Ports)                   │    │
-│  └─────────────────────────────────────────────────────┘    │
-├─────────────────────────────────────────────────────────────┤
-│                 Secondary Adapters                         │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│  │ PostgreSQL  │  │   Redis     │  │  External   │        │
-│  │   (pgx)     │  │  (Future)   │  │    APIs     │        │
-│  └─────────────┘  └─────────────┘  └─────────────┘        │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph External ["🌐 External World"]
+        Client[Client Applications]
+        Browser[Web Browser]
+        CLI_User[CLI User]
+    end
+
+    subgraph Primary ["🔌 Primary Adapters"]
+        HTTP[📡 HTTP/REST<br/>Fiber Framework]
+        CLI[⚡ CLI<br/>Cobra Commands]
+        GraphQL[🔮 GraphQL<br/>Future Implementation]
+    end
+
+    subgraph Domain ["🎯 Domain Layer"]
+        subgraph Business ["💼 Business Logic"]
+            Entities[📦 Entities<br/>• Bank<br/>• Currency<br/>• Language<br/>• Geodirectory<br/>• APIKey]
+            Services[⚙️ Services<br/>• Business Rules<br/>• Validation<br/>• Orchestration]
+            ValueObjects[💎 Value Objects<br/>• Email<br/>• Coordinates]
+            Ports[🔌 Repository Interfaces<br/>Ports/Contracts]
+        end
+    end
+
+    subgraph Secondary ["🔧 Secondary Adapters"]
+        PostgreSQL[🐘 PostgreSQL<br/>pgx Driver]
+        Redis[🔴 Redis<br/>Future Caching]
+        External_APIs[🌍 External APIs<br/>Integration]
+        FileSystem[📁 File System<br/>Migrations/Logs]
+    end
+
+    %% Connections
+    Client --> HTTP
+    Browser --> HTTP
+    CLI_User --> CLI
+    
+    HTTP --> Services
+    CLI --> Services
+    GraphQL --> Services
+    
+    Services --> Entities
+    Services --> ValueObjects
+    Services --> Ports
+    
+    Ports --> PostgreSQL
+    Ports --> Redis
+    Ports --> External_APIs
+    Ports --> FileSystem
+
+    %% Styling
+    classDef primaryAdapter fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef domainLayer fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef secondaryAdapter fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef external fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+
+    class HTTP,CLI,GraphQL primaryAdapter
+    class Entities,Services,ValueObjects,Ports domainLayer
+    class PostgreSQL,Redis,External_APIs,FileSystem secondaryAdapter
+    class Client,Browser,CLI_User external
 ```
 
 ### Project Structure
@@ -387,6 +422,46 @@ docker-compose up -d
 # Or build manually
 docker build -t master-data-api .
 docker run -p 8080:8080 --env-file .env master-data-api
+
+# Pull from Docker Hub
+docker pull turahe/master-data-rest-api:latest
+docker run -p 8080:8080 --env-file .env turahe/master-data-rest-api:latest
+```
+
+#### Docker Deployment Flow
+
+```mermaid
+graph LR
+    subgraph Development ["💻 Development"]
+        Code[Source Code]
+        Tests[Unit Tests]
+        Build[Docker Build]
+    end
+
+    subgraph Registry ["📦 Docker Registry"]
+        DockerHub[🐳 Docker Hub<br/>turahe/master-data-rest-api]
+    end
+
+    subgraph Production ["🚀 Production"]
+        Docker[🐳 Docker Engine]
+        PostgreSQL[🐘 PostgreSQL]
+        App[📱 API Application]
+    end
+
+    Code --> Tests
+    Tests --> Build
+    Build --> DockerHub
+    DockerHub --> Docker
+    Docker --> App
+    PostgreSQL --> App
+
+    classDef dev fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef registry fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef prod fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+
+    class Code,Tests,Build dev
+    class DockerHub registry
+    class Docker,PostgreSQL,App prod
 ```
 
 ### Manual Deployment
