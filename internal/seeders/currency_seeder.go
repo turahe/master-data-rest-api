@@ -132,21 +132,12 @@ func (cs *CurrencySeeder) Seed(ctx context.Context, dataDir string) error {
 
 // Clear removes all currency data
 func (cs *CurrencySeeder) Clear(ctx context.Context) error {
-	// Get all currencies first to count them
-	currencies, err := cs.repo.GetAll(ctx, 10000, 0) // Get up to 10k records with 0 offset
-	if err != nil {
-		return fmt.Errorf("failed to get currencies for clearing: %w", err)
+	cs.logger.Info("Clearing currency data using TRUNCATE")
+
+	if err := cs.repo.Truncate(ctx); err != nil {
+		return fmt.Errorf("failed to truncate currencies table: %w", err)
 	}
 
-	cs.logger.WithField("count", len(currencies)).Info("Clearing existing currencies")
-
-	for _, currency := range currencies {
-		if err := cs.repo.Delete(ctx, currency.ID); err != nil {
-			cs.logger.WithError(err).WithField("id", currency.ID).Warn("Failed to delete currency")
-			// Continue with others even if one fails
-		}
-	}
-
-	cs.logger.WithField("count", len(currencies)).Info("Currencies cleared successfully")
+	cs.logger.Info("Currencies table truncated successfully")
 	return nil
 }

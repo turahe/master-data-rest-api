@@ -852,3 +852,13 @@ func (r *GeodirectoryRepository) scanGeodirectories(rows pgx.Rows) ([]*entities.
 
 	return geodirectories, nil
 }
+
+// Truncate removes all geodirectory records efficiently using TRUNCATE
+func (r *GeodirectoryRepository) Truncate(ctx context.Context) error {
+	query := `TRUNCATE TABLE tm_geodirectories RESTART IDENTITY CASCADE`
+	_, err := r.pool.Exec(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to truncate geodirectories table: %w", err)
+	}
+	return nil
+}

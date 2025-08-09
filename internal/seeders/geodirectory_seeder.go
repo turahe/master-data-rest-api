@@ -135,67 +135,12 @@ func (gs *GeodirectorySeeder) seedProvinces(ctx context.Context, geoDir string) 
 
 // Clear removes all geodirectory data
 func (gs *GeodirectorySeeder) Clear(ctx context.Context) error {
-	gs.logger.Info("Clearing geodirectory data")
+	gs.logger.Info("Clearing geodirectory data using TRUNCATE")
 
-	// Clear in reverse hierarchical order to maintain referential integrity
-	// Villages -> Districts -> Cities -> Provinces
-
-	if err := gs.clearByType(ctx, entities.GeoTypeVillage); err != nil {
-		return fmt.Errorf("failed to clear villages: %w", err)
+	if err := gs.repo.Truncate(ctx); err != nil {
+		return fmt.Errorf("failed to truncate geodirectories table: %w", err)
 	}
 
-	if err := gs.clearByType(ctx, entities.GeoTypeDistrict); err != nil {
-		return fmt.Errorf("failed to clear districts: %w", err)
-	}
-
-	if err := gs.clearByType(ctx, entities.GeoTypeCity); err != nil {
-		return fmt.Errorf("failed to clear cities: %w", err)
-	}
-
-	if err := gs.clearByType(ctx, entities.GeoTypeProvince); err != nil {
-		return fmt.Errorf("failed to clear provinces: %w", err)
-	}
-
-	gs.logger.Info("Geodirectory data cleared successfully")
-	return nil
-}
-
-// clearByType clears all geodirectories of a specific type
-func (gs *GeodirectorySeeder) clearByType(ctx context.Context, geoType entities.GeoType) error {
-	gs.logger.WithField("type", geoType).Info("Clearing geodirectories by type")
-
-	// Get all geodirectories of this type
-	geodirectories, err := gs.repo.GetByType(ctx, geoType, 10000, 0)
-	if err != nil {
-		if isNotFoundError(err) {
-			gs.logger.WithField("type", geoType).Info("No geodirectories found to clear")
-			return nil
-		}
-		return fmt.Errorf("failed to get geodirectories by type %s: %w", geoType, err)
-	}
-
-	if len(geodirectories) == 0 {
-		gs.logger.WithField("type", geoType).Info("No geodirectories found to clear")
-		return nil
-	}
-
-	deletedCount := 0
-	for _, geo := range geodirectories {
-		if err := gs.repo.Delete(ctx, geo.ID); err != nil {
-			gs.logger.WithError(err).WithFields(map[string]interface{}{
-				"id":   geo.ID,
-				"type": geoType,
-				"name": geo.Name,
-			}).Warn("Failed to delete geodirectory during clear")
-			continue
-		}
-		deletedCount++
-	}
-
-	gs.logger.WithFields(map[string]interface{}{
-		"type":  geoType,
-		"count": deletedCount,
-	}).Info("Geodirectories cleared by type")
-
+	gs.logger.Info("Geodirectories table truncated successfully")
 	return nil
 }

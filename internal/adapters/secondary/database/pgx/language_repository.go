@@ -315,3 +315,13 @@ func (r *LanguageRepository) scanLanguages(rows pgx.Rows) ([]*entities.Language,
 
 	return languages, nil
 }
+
+// Truncate removes all language records efficiently using TRUNCATE
+func (r *LanguageRepository) Truncate(ctx context.Context) error {
+	query := `TRUNCATE TABLE tm_languages RESTART IDENTITY CASCADE`
+	_, err := r.pool.Exec(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to truncate languages table: %w", err)
+	}
+	return nil
+}

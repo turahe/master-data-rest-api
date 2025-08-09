@@ -333,3 +333,13 @@ func (r *CurrencyRepository) scanCurrencies(rows pgx.Rows) ([]*entities.Currency
 
 	return currencies, nil
 }
+
+// Truncate removes all currency records efficiently using TRUNCATE
+func (r *CurrencyRepository) Truncate(ctx context.Context) error {
+	query := `TRUNCATE TABLE tm_currencies RESTART IDENTITY CASCADE`
+	_, err := r.pool.Exec(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to truncate currencies table: %w", err)
+	}
+	return nil
+}

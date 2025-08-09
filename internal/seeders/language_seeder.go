@@ -129,23 +129,14 @@ func (ls *LanguageSeeder) Seed(ctx context.Context, dataDir string) error {
 	return nil
 }
 
-// Clear removes all language data
+// Clear removes all language data using TRUNCATE for efficiency
 func (ls *LanguageSeeder) Clear(ctx context.Context) error {
-	// Get all languages first to count them
-	languages, err := ls.repo.GetAll(ctx, 10000, 0) // Get up to 10k records with 0 offset
-	if err != nil {
-		return fmt.Errorf("failed to get languages for clearing: %w", err)
+	ls.logger.Info("Clearing language data using TRUNCATE")
+
+	if err := ls.repo.Truncate(ctx); err != nil {
+		return fmt.Errorf("failed to truncate languages table: %w", err)
 	}
 
-	ls.logger.WithField("count", len(languages)).Info("Clearing existing languages")
-
-	for _, language := range languages {
-		if err := ls.repo.Delete(ctx, language.ID); err != nil {
-			ls.logger.WithError(err).WithField("id", language.ID).Warn("Failed to delete language")
-			// Continue with others even if one fails
-		}
-	}
-
-	ls.logger.WithField("count", len(languages)).Info("Languages cleared successfully")
+	ls.logger.Info("Languages table truncated successfully")
 	return nil
 }

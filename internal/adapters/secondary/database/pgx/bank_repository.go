@@ -284,3 +284,13 @@ func (r *BankRepository) scanBanks(rows pgx.Rows) ([]*entities.Bank, error) {
 
 	return banks, nil
 }
+
+// Truncate removes all bank records efficiently using TRUNCATE
+func (r *BankRepository) Truncate(ctx context.Context) error {
+	query := `TRUNCATE TABLE tm_banks RESTART IDENTITY CASCADE`
+	_, err := r.pool.Exec(ctx, query)
+	if err != nil {
+		return fmt.Errorf("failed to truncate banks table: %w", err)
+	}
+	return nil
+}

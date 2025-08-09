@@ -133,21 +133,12 @@ func (bs *BankSeeder) Seed(ctx context.Context, dataDir string) error {
 
 // Clear removes all bank data
 func (bs *BankSeeder) Clear(ctx context.Context) error {
-	// Get all banks first to count them
-	banks, err := bs.repo.GetAll(ctx, 10000, 0) // Get up to 10k records with 0 offset
-	if err != nil {
-		return fmt.Errorf("failed to get banks for clearing: %w", err)
+	bs.logger.Info("Clearing bank data using TRUNCATE")
+
+	if err := bs.repo.Truncate(ctx); err != nil {
+		return fmt.Errorf("failed to truncate banks table: %w", err)
 	}
 
-	bs.logger.WithField("count", len(banks)).Info("Clearing existing banks")
-
-	for _, bank := range banks {
-		if err := bs.repo.Delete(ctx, bank.ID); err != nil {
-			bs.logger.WithError(err).WithField("id", bank.ID).Warn("Failed to delete bank")
-			// Continue with others even if one fails
-		}
-	}
-
-	bs.logger.WithField("count", len(banks)).Info("Banks cleared successfully")
+	bs.logger.Info("Banks table truncated successfully")
 	return nil
 }

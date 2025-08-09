@@ -75,14 +75,14 @@ func (sm *SeederManager) Clear(ctx context.Context, name string) error {
 			return fmt.Errorf("unknown seeder '%s'. Available: languages, banks, currencies, geodirectories", name)
 		}
 
-		sm.logger.WithField("seeder", name).Info("Starting specific clearing")
+		sm.logger.WithField("seeder", name).Info("Starting specific clearing using TRUNCATE")
 		return seeder.Clear(ctx)
 	}
 
-	// Clear all data types
-	sm.logger.Info("Starting clearing for all data types")
+	// Clear all data types using TRUNCATE for efficient bulk deletion
+	sm.logger.Info("Starting clearing for all data types using TRUNCATE")
 	for name, seeder := range sm.seeders {
-		sm.logger.WithField("seeder", name).Info("Starting clearing")
+		sm.logger.WithField("seeder", name).Info("Starting clearing with TRUNCATE")
 		if err := seeder.Clear(ctx); err != nil {
 			return fmt.Errorf("failed to clear %s: %w", name, err)
 		}
