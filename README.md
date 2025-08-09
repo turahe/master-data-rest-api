@@ -1,9 +1,15 @@
 # 🗺️ Master Data REST API
 
+[![CI](https://github.com/turahe/master-data-rest-api/workflows/CI/badge.svg)](https://github.com/turahe/master-data-rest-api/actions/workflows/ci.yml)
+[![Release](https://github.com/turahe/master-data-rest-api/workflows/Release/badge.svg)](https://github.com/turahe/master-data-rest-api/actions/workflows/release.yml)
+[![Docker](https://github.com/turahe/master-data-rest-api/workflows/Docker/badge.svg)](https://github.com/turahe/master-data-rest-api/actions/workflows/docker.yml)
 [![Go Version](https://img.shields.io/badge/go-1.21%2B-blue.svg)](https://golang.org/dl/)
 [![PostgreSQL](https://img.shields.io/badge/postgresql-13%2B-blue.svg)](https://www.postgresql.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![API Documentation](https://img.shields.io/badge/docs-swagger-green.svg)](http://localhost:8080/swagger/index.html)
+[![Docker Pulls](https://img.shields.io/docker/pulls/turahe/master-data-rest-api)](https://hub.docker.com/r/turahe/master-data-rest-api)
+[![GitHub release](https://img.shields.io/github/release/turahe/master-data-rest-api.svg)](https://github.com/turahe/master-data-rest-api/releases)
+[![Coverage](https://img.shields.io/codecov/c/github/turahe/master-data-rest-api)](https://codecov.io/gh/turahe/master-data-rest-api)
 
 A modern, high-performance REST API built with **Go** and **Hexagonal Architecture** for managing master data including geographical information, banks, currencies, and languages. Features comprehensive CLI tools, database logging, and API key authentication.
 
