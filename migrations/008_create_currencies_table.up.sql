@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS tm_currencies (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_code ON tm_currencies(code);
-CREATE INDEX idx_name ON tm_currencies(name);
-CREATE INDEX idx_symbol ON tm_currencies(symbol);
-CREATE INDEX idx_is_active ON tm_currencies(is_active); 
+CREATE INDEX IF NOT EXISTS idx_code_currencies ON tm_currencies(code);
+CREATE INDEX IF NOT EXISTS idx_name_currencies ON tm_currencies(name);
+CREATE INDEX IF NOT EXISTS idx_symbol_currencies ON tm_currencies(symbol);
+CREATE INDEX IF NOT EXISTS idx_is_active_currencies ON tm_currencies(is_active); 

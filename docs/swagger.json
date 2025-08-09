@@ -18,9 +18,65 @@
     "host": "localhost:8080",
     "basePath": "/api/v1",
     "paths": {
-        "/api/v1/banks": {
+        "/api/v1/api-keys": {
             "get": {
-                "description": "Get all banks with optional pagination",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all API keys with pagination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "api-keys"
+                ],
+                "summary": "Get all API keys",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "API keys retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new API key with the provided information",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,40 +84,404 @@
                     "application/json"
                 ],
                 "tags": [
-                    "banks"
+                    "api-keys"
                 ],
-                "summary": "Get all banks",
-                "responses": {
-                    "200": {
-                        "description": "Banks retrieved successfully",
+                "summary": "Create a new API key",
+                "parameters": [
+                    {
+                        "description": "API key information",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/entities.Bank"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/internal_adapters_primary_http.CreateAPIKeyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "API key created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/api-keys/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get an API key by its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "api-keys"
+                ],
+                "summary": "Get API key by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "API key retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "API key not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update an existing API key",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "api-keys"
+                ],
+                "summary": "Update an API key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated API key information",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_adapters_primary_http.UpdateAPIKeyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "API key updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "API key not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Soft delete an API key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "api-keys"
+                ],
+                "summary": "Delete an API key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "API key deleted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "API key not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/api-keys/{id}/activate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Activate a deactivated API key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "api-keys"
+                ],
+                "summary": "Activate an API key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "API key activated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "API key not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/api-keys/{id}/deactivate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deactivate an active API key",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "api-keys"
+                ],
+                "summary": "Deactivate an API key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "API key deactivated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "API key not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/banks": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all banks with pagination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "banks"
+                ],
+                "summary": "Get all banks",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Banks retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create a new bank with the provided information",
                 "consumes": [
                     "application/json"
@@ -76,11 +496,11 @@
                 "parameters": [
                     {
                         "description": "Bank information",
-                        "name": "request",
+                        "name": "bank",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/internal_adapters_primary_http.CreateBankRequest"
                         }
                     }
                 ],
@@ -88,90 +508,25 @@
                     "201": {
                         "description": "Bank created successfully",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.Bank"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/banks/alias/{alias}": {
-            "get": {
-                "description": "Get banks by alias (can return multiple)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "banks"
-                ],
-                "summary": "Get banks by alias",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bank alias",
-                        "name": "alias",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Banks found",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/entities.Bank"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "Banks not found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
@@ -179,10 +534,12 @@
         },
         "/api/v1/banks/code/{code}": {
             "get": {
-                "description": "Get a bank by its code",
-                "consumes": [
-                    "application/json"
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
+                "description": "Get a bank by its code",
                 "produces": [
                     "application/json"
                 ],
@@ -193,7 +550,7 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Bank code",
+                        "description": "Bank Code",
                         "name": "code",
                         "in": "path",
                         "required": true
@@ -201,192 +558,93 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Bank found",
+                        "description": "Bank retrieved successfully",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.Bank"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "404": {
                         "description": "Bank not found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
             }
         },
-        "/api/v1/banks/company/{company}": {
+        "/api/v1/banks/search": {
             "get": {
-                "description": "Get all banks for a specific company",
-                "consumes": [
-                    "application/json"
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
+                "description": "Search banks by name, alias, company, or code",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "banks"
                 ],
-                "summary": "Get banks by company",
+                "summary": "Search banks",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Company name",
-                        "name": "company",
-                        "in": "path",
+                        "description": "Search query",
+                        "name": "q",
+                        "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "Banks found",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/entities.Bank"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
-                    "404": {
-                        "description": "Banks not found",
+                    "400": {
+                        "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/banks/count": {
-            "get": {
-                "description": "Get the total number of banks",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "banks"
-                ],
-                "summary": "Get bank count",
-                "responses": {
-                    "200": {
-                        "description": "Bank count retrieved successfully",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/banks/name/{name}": {
-            "get": {
-                "description": "Get banks by name (can return multiple)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "banks"
-                ],
-                "summary": "Get banks by name",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bank name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Banks found",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/entities.Bank"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "Banks not found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
@@ -394,10 +652,12 @@
         },
         "/api/v1/banks/{id}": {
             "get": {
-                "description": "Get a bank by its UUID",
-                "consumes": [
-                    "application/json"
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
+                "description": "Get a bank by its UUID",
                 "produces": [
                     "application/json"
                 ],
@@ -408,8 +668,7 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "uuid",
-                        "description": "Bank ID",
+                        "description": "Bank ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -417,45 +676,44 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Bank found",
+                        "description": "Bank retrieved successfully",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.Bank"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "404": {
                         "description": "Bank not found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
             },
             "put": {
-                "description": "Update a bank with the provided information",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update an existing bank",
                 "consumes": [
                     "application/json"
                 ],
@@ -469,19 +727,18 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "uuid",
-                        "description": "Bank ID",
+                        "description": "Bank ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Bank information",
-                        "name": "request",
+                        "description": "Updated bank information",
+                        "name": "bank",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/internal_adapters_primary_http.UpdateBankRequest"
                         }
                     }
                 ],
@@ -489,46 +746,42 @@
                     "200": {
                         "description": "Bank updated successfully",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.Bank"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "404": {
                         "description": "Bank not found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
             },
             "delete": {
-                "description": "Delete a bank by its UUID",
-                "consumes": [
-                    "application/json"
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
+                "description": "Delete a bank by ID",
                 "produces": [
                     "application/json"
                 ],
@@ -539,8 +792,7 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "uuid",
-                        "description": "Bank ID",
+                        "description": "Bank ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -550,75 +802,95 @@
                     "200": {
                         "description": "Bank deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "404": {
                         "description": "Bank not found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
             }
         },
-        "/api/v1/cities": {
+        "/api/v1/geodirectories": {
             "get": {
-                "description": "Get all cities with optional pagination",
-                "consumes": [
-                    "application/json"
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
+                "description": "Get all geodirectories with pagination",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "cities"
+                    "geodirectories"
                 ],
-                "summary": "Get all cities",
+                "summary": "Get all geodirectories",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "Cities retrieved successfully",
+                        "description": "Geodirectories retrieved successfully",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/entities.City"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
             },
             "post": {
-                "description": "Create a new city with the provided information",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new geodirectory with hierarchical support",
                 "consumes": [
                     "application/json"
                 ],
@@ -626,291 +898,248 @@
                     "application/json"
                 ],
                 "tags": [
-                    "cities"
+                    "geodirectories"
                 ],
-                "summary": "Create a new city",
+                "summary": "Create a new geodirectory",
                 "parameters": [
                     {
-                        "description": "City information",
-                        "name": "request",
+                        "description": "Geodirectory data",
+                        "name": "geodirectory",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/internal_adapters_primary_http.CreateGeodirectoryRequest"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "City created successfully",
+                        "description": "Geodirectory created successfully",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.City"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
             }
         },
-        "/api/v1/cities/code/{code}": {
-            "get": {
-                "description": "Get a city by its code",
-                "consumes": [
-                    "application/json"
+        "/api/v1/geodirectories/rebuild": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
+                "description": "Rebuild the nested set structure for all geodirectories",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "cities"
+                    "geodirectories"
                 ],
-                "summary": "Get city by code",
+                "summary": "Rebuild nested set structure",
+                "responses": {
+                    "200": {
+                        "description": "Nested set rebuilt successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/geodirectories/search": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Search geodirectories by name, code, or postal code",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geodirectories"
+                ],
+                "summary": "Search geodirectories",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "City code",
-                        "name": "code",
-                        "in": "path",
+                        "description": "Search query",
+                        "name": "q",
+                        "in": "query",
                         "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "City found",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.City"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
                     },
-                    "404": {
-                        "description": "City not found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/cities/count": {
-            "get": {
-                "description": "Get the total number of cities",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "cities"
-                ],
-                "summary": "Get city count",
-                "responses": {
-                    "200": {
-                        "description": "City count retrieved successfully",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/cities/name/{name}": {
-            "get": {
-                "description": "Get a city by name",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "cities"
-                ],
-                "summary": "Get city by name",
-                "parameters": [
                     {
-                        "type": "string",
-                        "description": "City name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "City found",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.City"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
                     },
-                    "404": {
-                        "description": "City not found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/cities/province/{province_id}": {
-            "get": {
-                "description": "Get all cities for a specific province",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "cities"
-                ],
-                "summary": "Get cities by province",
-                "parameters": [
                     {
-                        "type": "string",
-                        "format": "uuid",
-                        "description": "Province ID",
-                        "name": "province_id",
-                        "in": "path",
-                        "required": true
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Cities found",
+                        "description": "Geodirectories found",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/entities.City"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
-                    "404": {
-                        "description": "Cities not found",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
             }
         },
-        "/api/v1/cities/{id}": {
+        "/api/v1/geodirectories/type/{type}": {
             "get": {
-                "description": "Get a city by its UUID",
-                "consumes": [
-                    "application/json"
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
+                "description": "Get geodirectories filtered by type",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "cities"
+                    "geodirectories"
                 ],
-                "summary": "Get city by ID",
+                "summary": "Get geodirectories by type",
+                "parameters": [
+                    {
+                        "enum": [
+                            "CONTINENT",
+                            "SUBCONTINENT",
+                            "COUNTRY",
+                            "STATE",
+                            "PROVINCE",
+                            "REGENCY",
+                            "CITY",
+                            "DISTRICT",
+                            "SUBDISTRICT",
+                            "VILLAGE"
+                        ],
+                        "type": "string",
+                        "description": "Geodirectory Type",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Geodirectories retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/geodirectories/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get a geodirectory by its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geodirectories"
+                ],
+                "summary": "Get geodirectory by ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "uuid",
-                        "description": "City ID",
+                        "description": "Geodirectory ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -918,45 +1147,44 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "City found",
+                        "description": "Geodirectory retrieved successfully",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.City"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "404": {
-                        "description": "City not found",
+                        "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
             },
             "put": {
-                "description": "Update a city with the provided information",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update an existing geodirectory",
                 "consumes": [
                     "application/json"
                 ],
@@ -964,84 +1192,78 @@
                     "application/json"
                 ],
                 "tags": [
-                    "cities"
+                    "geodirectories"
                 ],
-                "summary": "Update a city",
+                "summary": "Update a geodirectory",
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "uuid",
-                        "description": "City ID",
+                        "description": "Geodirectory ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "City information",
-                        "name": "request",
+                        "description": "Updated geodirectory data",
+                        "name": "geodirectory",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/internal_adapters_primary_http.UpdateGeodirectoryRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "City updated successfully",
+                        "description": "Geodirectory updated successfully",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.City"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "404": {
-                        "description": "City not found",
+                        "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
             },
             "delete": {
-                "description": "Delete a city by its UUID",
-                "consumes": [
-                    "application/json"
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
                 ],
+                "description": "Delete a geodirectory and all its descendants",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "cities"
+                    "geodirectories"
                 ],
-                "summary": "Delete a city",
+                "summary": "Delete a geodirectory",
                 "parameters": [
                     {
                         "type": "string",
-                        "format": "uuid",
-                        "description": "City ID",
+                        "description": "Geodirectory ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1049,35 +1271,312 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "City deleted successfully",
+                        "description": "Geodirectory deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "404": {
-                        "description": "City not found",
+                        "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
             }
         },
-        "/api/v1/countries": {
+        "/api/v1/geodirectories/{id}/ancestors": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all ancestors of a geodirectory using nested set model",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geodirectories"
+                ],
+                "summary": "Get ancestors of a geodirectory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Geodirectory ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ancestors retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Geodirectory not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/geodirectories/{id}/children": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get direct children of a geodirectory",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geodirectories"
+                ],
+                "summary": "Get children of a geodirectory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Parent Geodirectory ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by child type",
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Children retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Geodirectory not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/geodirectories/{id}/descendants": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all descendants of a geodirectory using nested set model",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geodirectories"
+                ],
+                "summary": "Get descendants of a geodirectory",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Geodirectory ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Descendants retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Geodirectory not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/geodirectories/{id}/hierarchy": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get a geodirectory with its parent and children",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "geodirectories"
+                ],
+                "summary": "Get geodirectory with hierarchy",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Geodirectory ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Geodirectory with hierarchy retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Geodirectory not found",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/geodirectories/{id}/move": {
             "post": {
-                "description": "Create a new country with the provided information",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Move a geodirectory and its descendants to a new parent",
                 "consumes": [
                     "application/json"
                 ],
@@ -1085,613 +1584,56 @@
                     "application/json"
                 ],
                 "tags": [
-                    "countries"
+                    "geodirectories"
                 ],
-                "summary": "Create a new country",
+                "summary": "Move a geodirectory to a new parent",
                 "parameters": [
                     {
-                        "description": "Country information",
+                        "type": "string",
+                        "description": "Geodirectory ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Move request data",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/internal_adapters_primary_http.MoveGeodirectoryRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Country created successfully",
+                    "200": {
+                        "description": "Geodirectory moved successfully",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.Country"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
-                    "500": {
-                        "description": "Internal server error",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/countries/{id}": {
-            "get": {
-                "description": "Get a country by its UUID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "countries"
-                ],
-                "summary": "Get country by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "format": "uuid",
-                        "description": "Country ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Country found",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.Country"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "404": {
-                        "description": "Country not found",
+                        "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/provinces": {
-            "get": {
-                "description": "Get all provinces with optional pagination",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "provinces"
-                ],
-                "summary": "Get all provinces",
-                "responses": {
-                    "200": {
-                        "description": "Provinces retrieved successfully",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/entities.Province"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new province with the provided information",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "provinces"
-                ],
-                "summary": "Create a new province",
-                "parameters": [
-                    {
-                        "description": "Province information",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Province created successfully",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.Province"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/provinces/code/{code}": {
-            "get": {
-                "description": "Get a province by its code",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "provinces"
-                ],
-                "summary": "Get province by code",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Province code",
-                        "name": "code",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Province found",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.Province"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "Province not found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/provinces/count": {
-            "get": {
-                "description": "Get the total number of provinces",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "provinces"
-                ],
-                "summary": "Get province count",
-                "responses": {
-                    "200": {
-                        "description": "Province count retrieved successfully",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "object"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/provinces/country/{country_id}": {
-            "get": {
-                "description": "Get all provinces for a specific country",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "provinces"
-                ],
-                "summary": "Get provinces by country",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "format": "uuid",
-                        "description": "Country ID",
-                        "name": "country_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Provinces found",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/entities.Province"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Provinces not found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/provinces/name/{name}": {
-            "get": {
-                "description": "Get a province by name",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "provinces"
-                ],
-                "summary": "Get province by name",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Province name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Province found",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.Province"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "Province not found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/provinces/{id}": {
-            "get": {
-                "description": "Get a province by its UUID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "provinces"
-                ],
-                "summary": "Get province by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "format": "uuid",
-                        "description": "Province ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Province found",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.Province"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Province not found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update a province with the provided information",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "provinces"
-                ],
-                "summary": "Update a province",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "format": "uuid",
-                        "description": "Province ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Province information",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Province updated successfully",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/entities.Province"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Province not found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a province by its UUID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "provinces"
-                ],
-                "summary": "Delete a province",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "format": "uuid",
-                        "description": "Province ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Province deleted successfully",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Province not found",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
                         }
                     }
                 }
@@ -1699,168 +1641,7 @@
         }
     },
     "definitions": {
-        "entities.Bank": {
-            "type": "object",
-            "properties": {
-                "alias": {
-                    "type": "string"
-                },
-                "code": {
-                    "type": "string"
-                },
-                "company": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entities.City": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "latitude": {
-                    "type": "string"
-                },
-                "longitude": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "province_id": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entities.Country": {
-            "type": "object",
-            "properties": {
-                "calling_code": {
-                    "type": "string"
-                },
-                "capital": {
-                    "type": "string"
-                },
-                "citizenship": {
-                    "type": "string"
-                },
-                "country_code": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "currency_code": {
-                    "type": "string"
-                },
-                "currency_name": {
-                    "type": "string"
-                },
-                "currency_sub_unit": {
-                    "type": "string"
-                },
-                "currency_symbol": {
-                    "type": "string"
-                },
-                "eea": {
-                    "type": "boolean"
-                },
-                "flag": {
-                    "type": "string"
-                },
-                "full_name": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "iso_3166_2": {
-                    "type": "string"
-                },
-                "iso_3166_3": {
-                    "type": "string"
-                },
-                "latitude": {
-                    "type": "string"
-                },
-                "longitude": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "region_code": {
-                    "type": "string"
-                },
-                "sub_region_code": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "entities.Province": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "country_id": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "iso_3166_2": {
-                    "type": "string"
-                },
-                "latitude": {
-                    "type": "string"
-                },
-                "longitude": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "region": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "response.Response": {
+        "github_com_turahe_master-data-rest-api_pkg_response.Response": {
             "type": "object",
             "properties": {
                 "data": {},
@@ -1874,11 +1655,145 @@
                     "type": "boolean"
                 }
             }
+        },
+        "internal_adapters_primary_http.CreateAPIKeyRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "description": "ISO 8601 format",
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_adapters_primary_http.CreateBankRequest": {
+            "type": "object",
+            "required": [
+                "alias",
+                "code",
+                "company",
+                "name"
+            ],
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "company": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_adapters_primary_http.CreateGeodirectoryRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "type"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "string"
+                },
+                "longitude": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "postal_code": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_adapters_primary_http.MoveGeodirectoryRequest": {
+            "type": "object",
+            "required": [
+                "new_parent_id"
+            ],
+            "properties": {
+                "new_parent_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_adapters_primary_http.UpdateAPIKeyRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "description": "ISO 8601 format",
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_adapters_primary_http.UpdateBankRequest": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "company": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_adapters_primary_http.UpdateGeodirectoryRequest": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "string"
+                },
+                "longitude": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "postal_code": {
+                    "type": "string"
+                }
+            }
         }
     },
     "securityDefinitions": {
-        "BearerAuth": {
-            "description": "Type \"Bearer\" followed by a space and JWT token.",
+        "ApiKeyAuth": {
+            "description": "Type \"Bearer\" followed by a space and API key.",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

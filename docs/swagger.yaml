@@ -1,112 +1,6 @@
 basePath: /api/v1
 definitions:
-  entities.Bank:
-    properties:
-      alias:
-        type: string
-      code:
-        type: string
-      company:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  entities.City:
-    properties:
-      code:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      latitude:
-        type: string
-      longitude:
-        type: string
-      name:
-        type: string
-      province_id:
-        type: string
-      type:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  entities.Country:
-    properties:
-      calling_code:
-        type: string
-      capital:
-        type: string
-      citizenship:
-        type: string
-      country_code:
-        type: string
-      created_at:
-        type: string
-      currency_code:
-        type: string
-      currency_name:
-        type: string
-      currency_sub_unit:
-        type: string
-      currency_symbol:
-        type: string
-      eea:
-        type: boolean
-      flag:
-        type: string
-      full_name:
-        type: string
-      id:
-        type: string
-      iso_3166_2:
-        type: string
-      iso_3166_3:
-        type: string
-      latitude:
-        type: string
-      longitude:
-        type: string
-      name:
-        type: string
-      region_code:
-        type: string
-      sub_region_code:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  entities.Province:
-    properties:
-      code:
-        type: string
-      country_id:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      iso_3166_2:
-        type: string
-      latitude:
-        type: string
-      longitude:
-        type: string
-      name:
-        type: string
-      region:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  response.Response:
+  github_com_turahe_master-data-rest-api_pkg_response.Response:
     properties:
       data: {}
       error:
@@ -115,6 +9,95 @@ definitions:
         type: string
       success:
         type: boolean
+    type: object
+  internal_adapters_primary_http.CreateAPIKeyRequest:
+    properties:
+      description:
+        type: string
+      expires_at:
+        description: ISO 8601 format
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  internal_adapters_primary_http.CreateBankRequest:
+    properties:
+      alias:
+        type: string
+      code:
+        type: string
+      company:
+        type: string
+      name:
+        type: string
+    required:
+    - alias
+    - code
+    - company
+    - name
+    type: object
+  internal_adapters_primary_http.CreateGeodirectoryRequest:
+    properties:
+      code:
+        type: string
+      latitude:
+        type: string
+      longitude:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+      postal_code:
+        type: string
+      type:
+        type: string
+    required:
+    - name
+    - type
+    type: object
+  internal_adapters_primary_http.MoveGeodirectoryRequest:
+    properties:
+      new_parent_id:
+        type: string
+    required:
+    - new_parent_id
+    type: object
+  internal_adapters_primary_http.UpdateAPIKeyRequest:
+    properties:
+      description:
+        type: string
+      expires_at:
+        description: ISO 8601 format
+        type: string
+      name:
+        type: string
+    type: object
+  internal_adapters_primary_http.UpdateBankRequest:
+    properties:
+      alias:
+        type: string
+      code:
+        type: string
+      company:
+        type: string
+      name:
+        type: string
+    type: object
+  internal_adapters_primary_http.UpdateGeodirectoryRequest:
+    properties:
+      code:
+        type: string
+      latitude:
+        type: string
+      longitude:
+        type: string
+      name:
+        type: string
+      postal_code:
+        type: string
     type: object
 host: localhost:8080
 info:
@@ -131,29 +114,297 @@ info:
   title: Master Data REST API
   version: "1.0"
 paths:
-  /api/v1/banks:
+  /api/v1/api-keys:
     get:
+      description: Get all API keys with pagination
+      parameters:
+      - default: 50
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: API keys retrieved successfully
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all API keys
+      tags:
+      - api-keys
+    post:
       consumes:
       - application/json
-      description: Get all banks with optional pagination
+      description: Create a new API key with the provided information
+      parameters:
+      - description: API key information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapters_primary_http.CreateAPIKeyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: API key created successfully
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new API key
+      tags:
+      - api-keys
+  /api/v1/api-keys/{id}:
+    delete:
+      description: Soft delete an API key
+      parameters:
+      - description: API Key ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: API key deleted successfully
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: API key not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete an API key
+      tags:
+      - api-keys
+    get:
+      description: Get an API key by its UUID
+      parameters:
+      - description: API Key ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: API key retrieved successfully
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: API key not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get API key by ID
+      tags:
+      - api-keys
+    put:
+      consumes:
+      - application/json
+      description: Update an existing API key
+      parameters:
+      - description: API Key ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated API key information
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapters_primary_http.UpdateAPIKeyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: API key updated successfully
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: API key not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update an API key
+      tags:
+      - api-keys
+  /api/v1/api-keys/{id}/activate:
+    post:
+      description: Activate a deactivated API key
+      parameters:
+      - description: API Key ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: API key activated successfully
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: API key not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Activate an API key
+      tags:
+      - api-keys
+  /api/v1/api-keys/{id}/deactivate:
+    post:
+      description: Deactivate an active API key
+      parameters:
+      - description: API Key ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: API key deactivated successfully
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: API key not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Deactivate an API key
+      tags:
+      - api-keys
+  /api/v1/banks:
+    get:
+      description: Get all banks with pagination
+      parameters:
+      - default: 50
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: Banks retrieved successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/entities.Bank'
-                  type: array
-              type: object
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get all banks
       tags:
       - banks
@@ -164,41 +415,39 @@ paths:
       parameters:
       - description: Bank information
         in: body
-        name: request
+        name: bank
         required: true
         schema:
-          type: object
+          $ref: '#/definitions/internal_adapters_primary_http.CreateBankRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Bank created successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.Bank'
-              type: object
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Create a new bank
       tags:
       - banks
   /api/v1/banks/{id}:
     delete:
-      consumes:
-      - application/json
-      description: Delete a bank by its UUID
+      description: Delete a bank by ID
       parameters:
-      - description: Bank ID
-        format: uuid
+      - description: Bank ID (UUID)
         in: path
         name: id
         required: true
@@ -209,29 +458,32 @@ paths:
         "200":
           description: Bank deleted successfully
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "404":
           description: Bank not found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Delete a bank
       tags:
       - banks
     get:
-      consumes:
-      - application/json
       description: Get a bank by its UUID
       parameters:
-      - description: Bank ID
-        format: uuid
+      - description: Bank ID (UUID)
         in: path
         name: id
         required: true
@@ -240,116 +492,79 @@ paths:
       - application/json
       responses:
         "200":
-          description: Bank found
+          description: Bank retrieved successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.Bank'
-              type: object
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "404":
           description: Bank not found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get bank by ID
       tags:
       - banks
     put:
       consumes:
       - application/json
-      description: Update a bank with the provided information
+      description: Update an existing bank
       parameters:
-      - description: Bank ID
-        format: uuid
+      - description: Bank ID (UUID)
         in: path
         name: id
         required: true
         type: string
-      - description: Bank information
+      - description: Updated bank information
         in: body
-        name: request
+        name: bank
         required: true
         schema:
-          type: object
+          $ref: '#/definitions/internal_adapters_primary_http.UpdateBankRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Bank updated successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.Bank'
-              type: object
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "404":
           description: Bank not found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Update a bank
-      tags:
-      - banks
-  /api/v1/banks/alias/{alias}:
-    get:
-      consumes:
-      - application/json
-      description: Get banks by alias (can return multiple)
-      parameters:
-      - description: Bank alias
-        in: path
-        name: alias
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Banks found
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/entities.Bank'
-                  type: array
-              type: object
-        "404":
-          description: Banks not found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get banks by alias
       tags:
       - banks
   /api/v1/banks/code/{code}:
     get:
-      consumes:
-      - application/json
       description: Get a bank by its code
       parameters:
-      - description: Bank code
+      - description: Bank Code
         in: path
         name: code
         required: true
@@ -358,189 +573,143 @@ paths:
       - application/json
       responses:
         "200":
-          description: Bank found
+          description: Bank retrieved successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.Bank'
-              type: object
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "404":
           description: Bank not found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
       summary: Get bank by code
       tags:
       - banks
-  /api/v1/banks/company/{company}:
+  /api/v1/banks/search:
     get:
-      consumes:
-      - application/json
-      description: Get all banks for a specific company
+      description: Search banks by name, alias, company, or code
       parameters:
-      - description: Company name
-        in: path
-        name: company
+      - description: Search query
+        in: query
+        name: q
         required: true
         type: string
+      - default: 50
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: Banks found
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/entities.Bank'
-                  type: array
-              type: object
-        "404":
-          description: Banks not found
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "400":
+          description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get banks by company
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Search banks
       tags:
       - banks
-  /api/v1/banks/count:
+  /api/v1/geodirectories:
     get:
-      consumes:
-      - application/json
-      description: Get the total number of banks
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Bank count retrieved successfully
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  type: object
-              type: object
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get bank count
-      tags:
-      - banks
-  /api/v1/banks/name/{name}:
-    get:
-      consumes:
-      - application/json
-      description: Get banks by name (can return multiple)
+      description: Get all geodirectories with pagination
       parameters:
-      - description: Bank name
-        in: path
-        name: name
-        required: true
-        type: string
+      - default: 50
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: Banks found
+          description: Geodirectories retrieved successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/entities.Bank'
-                  type: array
-              type: object
-        "404":
-          description: Banks not found
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get banks by name
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all geodirectories
       tags:
-      - banks
-  /api/v1/cities:
-    get:
-      consumes:
-      - application/json
-      description: Get all cities with optional pagination
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Cities retrieved successfully
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/entities.City'
-                  type: array
-              type: object
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get all cities
-      tags:
-      - cities
+      - geodirectories
     post:
       consumes:
       - application/json
-      description: Create a new city with the provided information
+      description: Create a new geodirectory with hierarchical support
       parameters:
-      - description: City information
+      - description: Geodirectory data
         in: body
-        name: request
+        name: geodirectory
         required: true
         schema:
-          type: object
+          $ref: '#/definitions/internal_adapters_primary_http.CreateGeodirectoryRequest'
       produces:
       - application/json
       responses:
         "201":
-          description: City created successfully
+          description: Geodirectory created successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.City'
-              type: object
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
-      summary: Create a new city
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new geodirectory
       tags:
-      - cities
-  /api/v1/cities/{id}:
+      - geodirectories
+  /api/v1/geodirectories/{id}:
     delete:
-      consumes:
-      - application/json
-      description: Delete a city by its UUID
+      description: Delete a geodirectory and all its descendants
       parameters:
-      - description: City ID
-        format: uuid
+      - description: Geodirectory ID (UUID)
         in: path
         name: id
         required: true
@@ -549,31 +718,34 @@ paths:
       - application/json
       responses:
         "200":
-          description: City deleted successfully
+          description: Geodirectory deleted successfully
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: City not found
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: Geodirectory not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
-      summary: Delete a city
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a geodirectory
       tags:
-      - cities
+      - geodirectories
     get:
-      consumes:
-      - application/json
-      description: Get a city by its UUID
+      description: Get a geodirectory by its UUID
       parameters:
-      - description: City ID
-        format: uuid
+      - description: Geodirectory ID (UUID)
         in: path
         name: id
         required: true
@@ -582,592 +754,414 @@ paths:
       - application/json
       responses:
         "200":
-          description: City found
+          description: Geodirectory retrieved successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.City'
-              type: object
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: City not found
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: Geodirectory not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get city by ID
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get geodirectory by ID
       tags:
-      - cities
+      - geodirectories
     put:
       consumes:
       - application/json
-      description: Update a city with the provided information
+      description: Update an existing geodirectory
       parameters:
-      - description: City ID
-        format: uuid
+      - description: Geodirectory ID (UUID)
         in: path
         name: id
         required: true
         type: string
-      - description: City information
+      - description: Updated geodirectory data
         in: body
-        name: request
+        name: geodirectory
         required: true
         schema:
-          type: object
+          $ref: '#/definitions/internal_adapters_primary_http.UpdateGeodirectoryRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: City updated successfully
+          description: Geodirectory updated successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.City'
-              type: object
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: City not found
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: Geodirectory not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
-      summary: Update a city
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a geodirectory
       tags:
-      - cities
-  /api/v1/cities/code/{code}:
+      - geodirectories
+  /api/v1/geodirectories/{id}/ancestors:
     get:
-      consumes:
-      - application/json
-      description: Get a city by its code
+      description: Get all ancestors of a geodirectory using nested set model
       parameters:
-      - description: City code
+      - description: Geodirectory ID (UUID)
         in: path
-        name: code
+        name: id
         required: true
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: City found
+          description: Ancestors retrieved successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.City'
-              type: object
-        "404":
-          description: City not found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get city by code
-      tags:
-      - cities
-  /api/v1/cities/count:
-    get:
-      consumes:
-      - application/json
-      description: Get the total number of cities
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: City count retrieved successfully
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  type: object
-              type: object
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get city count
-      tags:
-      - cities
-  /api/v1/cities/name/{name}:
-    get:
-      consumes:
-      - application/json
-      description: Get a city by name
-      parameters:
-      - description: City name
-        in: path
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: City found
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.City'
-              type: object
-        "404":
-          description: City not found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get city by name
-      tags:
-      - cities
-  /api/v1/cities/province/{province_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all cities for a specific province
-      parameters:
-      - description: Province ID
-        format: uuid
-        in: path
-        name: province_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Cities found
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/entities.City'
-                  type: array
-              type: object
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: Cities not found
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: Geodirectory not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get cities by province
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get ancestors of a geodirectory
       tags:
-      - cities
-  /api/v1/countries:
+      - geodirectories
+  /api/v1/geodirectories/{id}/children:
+    get:
+      description: Get direct children of a geodirectory
+      parameters:
+      - description: Parent Geodirectory ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Filter by child type
+        in: query
+        name: type
+        type: string
+      - default: 50
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Children retrieved successfully
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: Geodirectory not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get children of a geodirectory
+      tags:
+      - geodirectories
+  /api/v1/geodirectories/{id}/descendants:
+    get:
+      description: Get all descendants of a geodirectory using nested set model
+      parameters:
+      - description: Geodirectory ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: 100
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Descendants retrieved successfully
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: Geodirectory not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get descendants of a geodirectory
+      tags:
+      - geodirectories
+  /api/v1/geodirectories/{id}/hierarchy:
+    get:
+      description: Get a geodirectory with its parent and children
+      parameters:
+      - description: Geodirectory ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Geodirectory with hierarchy retrieved successfully
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "404":
+          description: Geodirectory not found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get geodirectory with hierarchy
+      tags:
+      - geodirectories
+  /api/v1/geodirectories/{id}/move:
     post:
       consumes:
       - application/json
-      description: Create a new country with the provided information
+      description: Move a geodirectory and its descendants to a new parent
       parameters:
-      - description: Country information
-        in: body
-        name: request
-        required: true
-        schema:
-          type: object
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Country created successfully
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.Country'
-              type: object
-        "400":
-          description: Bad request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Create a new country
-      tags:
-      - countries
-  /api/v1/countries/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get a country by its UUID
-      parameters:
-      - description: Country ID
-        format: uuid
+      - description: Geodirectory ID (UUID)
         in: path
         name: id
         required: true
         type: string
+      - description: Move request data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_adapters_primary_http.MoveGeodirectoryRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: Country found
+          description: Geodirectory moved successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.Country'
-              type: object
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "404":
-          description: Country not found
+          description: Geodirectory not found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get country by ID
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Move a geodirectory to a new parent
       tags:
-      - countries
-  /api/v1/provinces:
-    get:
-      consumes:
-      - application/json
-      description: Get all provinces with optional pagination
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Provinces retrieved successfully
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/entities.Province'
-                  type: array
-              type: object
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get all provinces
-      tags:
-      - provinces
+      - geodirectories
+  /api/v1/geodirectories/rebuild:
     post:
-      consumes:
-      - application/json
-      description: Create a new province with the provided information
-      parameters:
-      - description: Province information
-        in: body
-        name: request
-        required: true
-        schema:
-          type: object
+      description: Rebuild the nested set structure for all geodirectories
       produces:
       - application/json
       responses:
-        "201":
-          description: Province created successfully
+        "200":
+          description: Nested set rebuilt successfully
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.Province'
-              type: object
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Rebuild nested set structure
+      tags:
+      - geodirectories
+  /api/v1/geodirectories/search:
+    get:
+      description: Search geodirectories by name, code, or postal code
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        required: true
+        type: string
+      - default: 50
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Geodirectories found
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
-      summary: Create a new province
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Search geodirectories
       tags:
-      - provinces
-  /api/v1/provinces/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete a province by its UUID
+      - geodirectories
+  /api/v1/geodirectories/type/{type}:
+    get:
+      description: Get geodirectories filtered by type
       parameters:
-      - description: Province ID
-        format: uuid
+      - description: Geodirectory Type
+        enum:
+        - CONTINENT
+        - SUBCONTINENT
+        - COUNTRY
+        - STATE
+        - PROVINCE
+        - REGENCY
+        - CITY
+        - DISTRICT
+        - SUBDISTRICT
+        - VILLAGE
         in: path
-        name: id
+        name: type
         required: true
         type: string
+      - default: 50
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: Province deleted successfully
+          description: Geodirectories retrieved successfully
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: Province not found
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+        "401":
+          description: Unauthorized
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.Response'
-      summary: Delete a province
+            $ref: '#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get geodirectories by type
       tags:
-      - provinces
-    get:
-      consumes:
-      - application/json
-      description: Get a province by its UUID
-      parameters:
-      - description: Province ID
-        format: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Province found
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.Province'
-              type: object
-        "400":
-          description: Bad request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: Province not found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get province by ID
-      tags:
-      - provinces
-    put:
-      consumes:
-      - application/json
-      description: Update a province with the provided information
-      parameters:
-      - description: Province ID
-        format: uuid
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Province information
-        in: body
-        name: request
-        required: true
-        schema:
-          type: object
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Province updated successfully
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.Province'
-              type: object
-        "400":
-          description: Bad request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: Province not found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Update a province
-      tags:
-      - provinces
-  /api/v1/provinces/code/{code}:
-    get:
-      consumes:
-      - application/json
-      description: Get a province by its code
-      parameters:
-      - description: Province code
-        in: path
-        name: code
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Province found
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.Province'
-              type: object
-        "404":
-          description: Province not found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get province by code
-      tags:
-      - provinces
-  /api/v1/provinces/count:
-    get:
-      consumes:
-      - application/json
-      description: Get the total number of provinces
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Province count retrieved successfully
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  type: object
-              type: object
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get province count
-      tags:
-      - provinces
-  /api/v1/provinces/country/{country_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get all provinces for a specific country
-      parameters:
-      - description: Country ID
-        format: uuid
-        in: path
-        name: country_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Provinces found
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/entities.Province'
-                  type: array
-              type: object
-        "400":
-          description: Bad request
-          schema:
-            $ref: '#/definitions/response.Response'
-        "404":
-          description: Provinces not found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get provinces by country
-      tags:
-      - provinces
-  /api/v1/provinces/name/{name}:
-    get:
-      consumes:
-      - application/json
-      description: Get a province by name
-      parameters:
-      - description: Province name
-        in: path
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Province found
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/entities.Province'
-              type: object
-        "404":
-          description: Province not found
-          schema:
-            $ref: '#/definitions/response.Response'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/response.Response'
-      summary: Get province by name
-      tags:
-      - provinces
+      - geodirectories
 securityDefinitions:
-  BearerAuth:
-    description: Type "Bearer" followed by a space and JWT token.
+  ApiKeyAuth:
+    description: Type "Bearer" followed by a space and API key.
     in: header
     name: Authorization
     type: apiKey

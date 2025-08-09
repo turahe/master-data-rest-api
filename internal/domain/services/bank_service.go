@@ -1,6 +1,9 @@
 package services
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/turahe/master-data-rest-api/internal/domain/entities"
 	"github.com/turahe/master-data-rest-api/internal/domain/repositories"
@@ -18,63 +21,118 @@ func NewBankService(bankRepo repositories.BankRepository) *BankService {
 	}
 }
 
-// CreateBank creates a new bank
-func (s *BankService) CreateBank(name, alias, company, code string) (*entities.Bank, error) {
+// CreateBank creates a new bank with validation
+func (s *BankService) CreateBank(ctx context.Context, name, alias, company, code string) (*entities.Bank, error) {
+	// Validate required fields
+	if name == "" {
+		return nil, fmt.Errorf("bank name is required")
+	}
+	if code == "" {
+		return nil, fmt.Errorf("bank code is required")
+	}
+
+	// Check if bank with the same code already exists
+	exists, err := s.bankRepo.ExistsByCode(ctx, code)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check bank code existence: %w", err)
+	}
+	if exists {
+		return nil, fmt.Errorf("bank with code '%s' already exists", code)
+	}
+
+	// Check if bank with the same name already exists
+	exists, err = s.bankRepo.ExistsByName(ctx, name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check bank name existence: %w", err)
+	}
+	if exists {
+		return nil, fmt.Errorf("bank with name '%s' already exists", name)
+	}
+
 	bank := entities.NewBank(name, alias, company, code)
 
-	if err := s.bankRepo.Create(bank); err != nil {
-		return nil, err
+	if err := s.bankRepo.Create(ctx, bank); err != nil {
+		return nil, fmt.Errorf("failed to create bank: %w", err)
 	}
 
 	return bank, nil
 }
 
 // GetBankByID retrieves a bank by ID
-func (s *BankService) GetBankByID(id uuid.UUID) (*entities.Bank, error) {
-	return s.bankRepo.GetByID(id)
+func (s *BankService) GetBankByID(ctx context.Context, id uuid.UUID) (*entities.Bank, error) {
+	return s.bankRepo.GetByID(ctx, id)
 }
 
 // GetBankByCode retrieves a bank by code
-func (s *BankService) GetBankByCode(code string) (*entities.Bank, error) {
-	return s.bankRepo.GetByCode(code)
+func (s *BankService) GetBankByCode(ctx context.Context, code string) (*entities.Bank, error) {
+	return s.bankRepo.GetByCode(ctx, code)
 }
 
-// GetBankByName retrieves banks by name
-func (s *BankService) GetBankByName(name string) ([]*entities.Bank, error) {
-	return s.bankRepo.GetByName(name)
+// GetBankByName retrieves a bank by name
+func (s *BankService) GetBankByName(ctx context.Context, name string) (*entities.Bank, error) {
+	return s.bankRepo.GetByName(ctx, name)
 }
 
-// GetBankByAlias retrieves banks by alias
-func (s *BankService) GetBankByAlias(alias string) ([]*entities.Bank, error) {
-	return s.bankRepo.GetByAlias(alias)
+// GetBankByAlias retrieves a bank by alias
+func (s *BankService) GetBankByAlias(ctx context.Context, alias string) (*entities.Bank, error) {
+	return s.bankRepo.GetByAlias(ctx, alias)
+}
+
+// GetAllBanks retrieves all banks with pagination
+func (s *BankService) GetAllBanks(ctx context.Context, limit, offset int) ([]*entities.Bank, error) {
+	return s.bankRepo.GetAll(ctx, limit, offset)
+}
+
+// SearchBanks searches banks by query
+func (s *BankService) SearchBanks(ctx context.Context, query string, limit, offset int) ([]*entities.Bank, error) {
+	return s.bankRepo.Search(ctx, query, limit, offset)
 }
 
 // GetBanksByCompany retrieves banks by company
-func (s *BankService) GetBanksByCompany(company string) ([]*entities.Bank, error) {
-	return s.bankRepo.GetByCompany(company)
+func (s *BankService) GetBanksByCompany(ctx context.Context, company string, limit, offset int) ([]*entities.Bank, error) {
+	return s.bankRepo.GetByCompany(ctx, company, limit, offset)
 }
 
-// GetAllBanks retrieves all banks
-func (s *BankService) GetAllBanks() ([]*entities.Bank, error) {
-	return s.bankRepo.GetAll()
-}
+// UpdateBank updates an existing bank
+func (s *BankService) UpdateBank(ctx context.Context, bank *entities.Bank) error {
+	if !bank.IsValid() {
+		return fmt.Errorf("invalid bank data")
+	}
 
-// UpdateBank updates a bank
-func (s *BankService) UpdateBank(bank *entities.Bank) error {
-	return s.bankRepo.Update(bank)
+	// Check if updating to a code that already exists (but not for the same bank)
+	existingBank, err := s.bankRepo.GetByCode(ctx, bank.Code)
+	if err == nil && existingBank.ID != bank.ID {
+		return fmt.Errorf("bank with code '%s' already exists", bank.Code)
+	}
+
+	// Check if updating to a name that already exists (but not for the same bank)
+	existingBank, err = s.bankRepo.GetByName(ctx, bank.Name)
+	if err == nil && existingBank.ID != bank.ID {
+		return fmt.Errorf("bank with name '%s' already exists", bank.Name)
+	}
+
+	return s.bankRepo.Update(ctx, bank)
 }
 
 // DeleteBank deletes a bank by ID
-func (s *BankService) DeleteBank(id uuid.UUID) error {
-	return s.bankRepo.Delete(id)
+func (s *BankService) DeleteBank(ctx context.Context, id uuid.UUID) error {
+	return s.bankRepo.Delete(ctx, id)
 }
 
-// BankExists checks if a bank exists by ID
-func (s *BankService) BankExists(id uuid.UUID) (bool, error) {
-	return s.bankRepo.Exists(id)
+// CountBanks returns the total number of banks
+func (s *BankService) CountBanks(ctx context.Context) (int64, error) {
+	return s.bankRepo.Count(ctx)
 }
 
-// GetBankCount returns the total number of banks
-func (s *BankService) GetBankCount() (int64, error) {
-	return s.bankRepo.Count()
+// ValidateBank validates a bank entity
+func (s *BankService) ValidateBank(bank *entities.Bank) error {
+	if bank == nil {
+		return fmt.Errorf("bank cannot be nil")
+	}
+
+	if !bank.IsValid() {
+		return fmt.Errorf("bank validation failed: name and code are required")
+	}
+
+	return nil
 }

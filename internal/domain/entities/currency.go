@@ -4,62 +4,54 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
-// Currency represents a currency in the master data system
+// Currency represents a currency entity
 type Currency struct {
-	ID                   uuid.UUID `json:"id" gorm:"type:char(36);primary_key"`
-	Priority             *int      `json:"priority" gorm:"type:int"`
-	ISOCode              string    `json:"iso_code" gorm:"type:varchar(3);unique;not null"`
-	Name                 *string   `json:"name" gorm:"type:varchar(255)"`
-	Symbol               *string   `json:"symbol" gorm:"type:varchar(10)"`
-	DisambiguateSymbol   *string   `json:"disambiguate_symbol" gorm:"type:varchar(10)"`
-	AlternateSymbols     *string   `json:"alternate_symbols" gorm:"type:text"`
-	Subunit              *string   `json:"subunit" gorm:"type:varchar(255)"`
-	SubunitToUnit        int       `json:"subunit_to_unit" gorm:"not null"`
-	SymbolFirst          bool      `json:"symbol_first" gorm:"default:false"`
-	HTMLEntity           *string   `json:"html_entity" gorm:"type:varchar(50)"`
-	DecimalMark          *string   `json:"decimal_mark" gorm:"type:varchar(10)"`
-	ThousandsSeparator   *string   `json:"thousands_separator" gorm:"type:varchar(10)"`
-	ISONumeric           *string   `json:"iso_numeric" gorm:"type:varchar(10)"`
-	SmallestDenomination int       `json:"smallest_denomination" gorm:"not null"`
-	CreatedAt            time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt            time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	ID            uuid.UUID `json:"id" db:"id"`
+	Name          string    `json:"name" db:"name"`
+	Code          string    `json:"code" db:"code"`
+	Symbol        *string   `json:"symbol,omitempty" db:"symbol"`
+	DecimalPlaces int       `json:"decimal_places" db:"decimal_places"`
+	IsActive      bool      `json:"is_active" db:"is_active"`
+	CreatedAt     time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at" db:"updated_at"`
 }
 
-// TableName specifies the table name for GORM
+// TableName returns the table name for the Currency entity
 func (c *Currency) TableName() string {
 	return "tm_currencies"
 }
 
-// BeforeCreate is a GORM hook that runs before creating a record
-func (c *Currency) BeforeCreate(tx *gorm.DB) error {
+// GenerateID generates a new UUID for the currency if not set
+func (c *Currency) GenerateID() {
 	if c.ID == uuid.Nil {
 		c.ID = uuid.New()
 	}
-	return nil
 }
 
 // NewCurrency creates a new Currency instance
-func NewCurrency(isoCode string, subunitToUnit int, symbolFirst bool, smallestDenomination int) *Currency {
+func NewCurrency(name, code string, decimalPlaces int) *Currency {
 	return &Currency{
-		ISOCode:              isoCode,
-		SubunitToUnit:        subunitToUnit,
-		SymbolFirst:          symbolFirst,
-		SmallestDenomination: smallestDenomination,
+		ID:            uuid.New(),
+		Name:          name,
+		Code:          code,
+		DecimalPlaces: decimalPlaces,
+		IsActive:      true,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
-}
-
-// SetPriority sets the priority of the currency
-func (c *Currency) SetPriority(priority int) {
-	c.Priority = &priority
-	c.UpdatedAt = time.Now()
 }
 
 // SetName sets the name of the currency
 func (c *Currency) SetName(name string) {
-	c.Name = &name
+	c.Name = name
+	c.UpdatedAt = time.Now()
+}
+
+// SetCode sets the code of the currency
+func (c *Currency) SetCode(code string) {
+	c.Code = code
 	c.UpdatedAt = time.Now()
 }
 
@@ -69,55 +61,33 @@ func (c *Currency) SetSymbol(symbol string) {
 	c.UpdatedAt = time.Now()
 }
 
-// SetDisambiguateSymbol sets the disambiguate symbol
-func (c *Currency) SetDisambiguateSymbol(symbol string) {
-	c.DisambiguateSymbol = &symbol
+// SetDecimalPlaces sets the decimal places of the currency
+func (c *Currency) SetDecimalPlaces(places int) {
+	c.DecimalPlaces = places
 	c.UpdatedAt = time.Now()
 }
 
-// SetAlternateSymbols sets the alternate symbols
-func (c *Currency) SetAlternateSymbols(symbols string) {
-	c.AlternateSymbols = &symbols
+// Activate activates the currency
+func (c *Currency) Activate() {
+	c.IsActive = true
 	c.UpdatedAt = time.Now()
 }
 
-// SetSubunit sets the subunit name
-func (c *Currency) SetSubunit(subunit string) {
-	c.Subunit = &subunit
+// Deactivate deactivates the currency
+func (c *Currency) Deactivate() {
+	c.IsActive = false
 	c.UpdatedAt = time.Now()
 }
 
-// SetHTMLEntity sets the HTML entity
-func (c *Currency) SetHTMLEntity(entity string) {
-	c.HTMLEntity = &entity
-	c.UpdatedAt = time.Now()
+// IsValid validates the currency entity
+func (c *Currency) IsValid() bool {
+	return c.Name != "" && c.Code != "" && len(c.Code) <= 3 && c.DecimalPlaces >= 0
 }
 
-// SetDecimalMark sets the decimal mark
-func (c *Currency) SetDecimalMark(mark string) {
-	c.DecimalMark = &mark
-	c.UpdatedAt = time.Now()
-}
-
-// SetThousandsSeparator sets the thousands separator
-func (c *Currency) SetThousandsSeparator(separator string) {
-	c.ThousandsSeparator = &separator
-	c.UpdatedAt = time.Now()
-}
-
-// SetISONumeric sets the ISO numeric code
-func (c *Currency) SetISONumeric(code string) {
-	c.ISONumeric = &code
-	c.UpdatedAt = time.Now()
-}
-
-// GetDisplaySymbol returns the display symbol (disambiguate symbol if available, otherwise symbol)
-func (c *Currency) GetDisplaySymbol() string {
-	if c.DisambiguateSymbol != nil && *c.DisambiguateSymbol != "" {
-		return *c.DisambiguateSymbol
-	}
+// GetDisplayName returns the display name with symbol if available
+func (c *Currency) GetDisplayName() string {
 	if c.Symbol != nil && *c.Symbol != "" {
-		return *c.Symbol
+		return c.Name + " (" + *c.Symbol + ")"
 	}
-	return c.ISOCode
+	return c.Name
 }

@@ -7,6 +7,6 @@ CREATE TABLE IF NOT EXISTS tm_languages (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_code ON tm_languages(code);
-CREATE INDEX idx_name ON tm_languages(name);
-CREATE INDEX idx_is_active ON tm_languages(is_active); 
+CREATE INDEX IF NOT EXISTS idx_code_languages ON tm_languages(code);
+CREATE INDEX IF NOT EXISTS idx_name_languages ON tm_languages(name);
+CREATE INDEX IF NOT EXISTS idx_is_active_languages ON tm_languages(is_active); 

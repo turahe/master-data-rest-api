@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS tm_banks (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_code ON tm_banks(code);
-CREATE INDEX idx_name ON tm_banks(name);
-CREATE INDEX idx_alias ON tm_banks(alias);
-CREATE INDEX idx_company ON tm_banks(company); 
+CREATE INDEX IF NOT EXISTS idx_code_banks ON tm_banks(code);
+CREATE INDEX IF NOT EXISTS idx_name_banks ON tm_banks(name);
+CREATE INDEX IF NOT EXISTS idx_alias_banks ON tm_banks(alias);
+CREATE INDEX IF NOT EXISTS idx_company_banks ON tm_banks(company); 

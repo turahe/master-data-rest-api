@@ -4,55 +4,69 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
-// Bank represents a bank in the master data system
+// Bank represents a bank entity
 type Bank struct {
-	ID        uuid.UUID `json:"id" gorm:"type:char(36);primary_key"`
-	Name      string    `json:"name" gorm:"type:varchar(255);not null"`
-	Alias     string    `json:"alias" gorm:"type:varchar(255);not null"`
-	Company   string    `json:"company" gorm:"type:varchar(255);not null"`
-	Code      string    `json:"code" gorm:"type:varchar(50);unique;not null"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	ID        uuid.UUID `json:"id" db:"id"`
+	Name      string    `json:"name" db:"name"`
+	Alias     string    `json:"alias" db:"alias"`
+	Company   string    `json:"company" db:"company"`
+	Code      string    `json:"code" db:"code"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
-// TableName specifies the table name for GORM
+// TableName returns the table name for the Bank entity
 func (b *Bank) TableName() string {
 	return "tm_banks"
 }
 
-// BeforeCreate is a GORM hook that runs before creating a record
-func (b *Bank) BeforeCreate(tx *gorm.DB) error {
+// GenerateID generates a new UUID for the bank if not set
+func (b *Bank) GenerateID() {
 	if b.ID == uuid.Nil {
 		b.ID = uuid.New()
 	}
-	return nil
 }
 
 // NewBank creates a new Bank instance
 func NewBank(name, alias, company, code string) *Bank {
 	return &Bank{
-		Name:    name,
-		Alias:   alias,
-		Company: company,
-		Code:    code,
+		ID:        uuid.New(),
+		Name:      name,
+		Alias:     alias,
+		Company:   company,
+		Code:      code,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 }
 
-// Update updates the bank information
-func (b *Bank) Update(name, alias, company string) {
+// SetName sets the name of the bank
+func (b *Bank) SetName(name string) {
 	b.Name = name
+	b.UpdatedAt = time.Now()
+}
+
+// SetAlias sets the alias of the bank
+func (b *Bank) SetAlias(alias string) {
 	b.Alias = alias
+	b.UpdatedAt = time.Now()
+}
+
+// SetCompany sets the company of the bank
+func (b *Bank) SetCompany(company string) {
 	b.Company = company
 	b.UpdatedAt = time.Now()
 }
 
-// GetDisplayName returns the display name (alias if available, otherwise name)
-func (b *Bank) GetDisplayName() string {
-	if b.Alias != "" {
-		return b.Alias
-	}
-	return b.Name
+// SetCode sets the code of the bank
+func (b *Bank) SetCode(code string) {
+	b.Code = code
+	b.UpdatedAt = time.Now()
+}
+
+// IsValid validates the bank entity
+func (b *Bank) IsValid() bool {
+	return b.Name != "" && b.Code != ""
 }
