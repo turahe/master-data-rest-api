@@ -25,6 +25,18 @@ func NewCurrencyHTTPHandler(currencyService *services.CurrencyService, searchSer
 }
 
 // CreateCurrency handles POST /api/v1/currencies
+// @Summary Create a new currency
+// @Description Create a new currency with the provided information
+// @Tags currencies
+// @Accept json
+// @Produce json
+// @Param currency body CreateCurrencyRequest true "Currency information"
+// @Success 201 {object} response.Response "Currency created successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/currencies [post]
 func (h *CurrencyHTTPHandler) CreateCurrency(c *fiber.Ctx) error {
 	var req CreateCurrencyRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -48,6 +60,18 @@ func (h *CurrencyHTTPHandler) CreateCurrency(c *fiber.Ctx) error {
 }
 
 // GetCurrencyByID handles GET /api/v1/currencies/:id
+// @Summary Get currency by ID
+// @Description Get a currency by its UUID
+// @Tags currencies
+// @Produce json
+// @Param id path string true "Currency ID (UUID)"
+// @Success 200 {object} response.Response "Currency retrieved successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 404 {object} response.Response "Currency not found"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/currencies/{id} [get]
 func (h *CurrencyHTTPHandler) GetCurrencyByID(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, err := uuid.Parse(idStr)
@@ -64,6 +88,17 @@ func (h *CurrencyHTTPHandler) GetCurrencyByID(c *fiber.Ctx) error {
 }
 
 // GetAllCurrencies handles GET /api/v1/currencies
+// @Summary Get all currencies
+// @Description Get all currencies with pagination
+// @Tags currencies
+// @Produce json
+// @Param limit query int false "Limit" default(50)
+// @Param offset query int false "Offset" default(0)
+// @Success 200 {object} response.Response "Currencies retrieved successfully"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/currencies [get]
 func (h *CurrencyHTTPHandler) GetAllCurrencies(c *fiber.Ctx) error {
 	limit, _ := strconv.Atoi(c.Query("limit", "50"))
 	offset, _ := strconv.Atoi(c.Query("offset", "0"))
@@ -77,6 +112,17 @@ func (h *CurrencyHTTPHandler) GetAllCurrencies(c *fiber.Ctx) error {
 }
 
 // GetActiveCurrencies handles GET /api/v1/currencies/active
+// @Summary Get active currencies
+// @Description Get all active currencies with pagination
+// @Tags currencies
+// @Produce json
+// @Param limit query int false "Limit" default(50)
+// @Param offset query int false "Offset" default(0)
+// @Success 200 {object} response.Response "Active currencies retrieved successfully"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/currencies/active [get]
 func (h *CurrencyHTTPHandler) GetActiveCurrencies(c *fiber.Ctx) error {
 	limit, _ := strconv.Atoi(c.Query("limit", "50"))
 	offset, _ := strconv.Atoi(c.Query("offset", "0"))
@@ -90,6 +136,19 @@ func (h *CurrencyHTTPHandler) GetActiveCurrencies(c *fiber.Ctx) error {
 }
 
 // SearchCurrencies handles GET /api/v1/currencies/search
+// @Summary Search currencies
+// @Description Search currencies by name, code, or symbol
+// @Tags currencies
+// @Produce json
+// @Param q query string true "Search query"
+// @Param limit query int false "Limit" default(50)
+// @Param offset query int false "Offset" default(0)
+// @Success 200 {object} response.Response "Currencies found"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/currencies/search [get]
 func (h *CurrencyHTTPHandler) SearchCurrencies(c *fiber.Ctx) error {
 	query := c.Query("q")
 	if query == "" {
@@ -108,6 +167,20 @@ func (h *CurrencyHTTPHandler) SearchCurrencies(c *fiber.Ctx) error {
 }
 
 // UpdateCurrency handles PUT /api/v1/currencies/:id
+// @Summary Update a currency
+// @Description Update an existing currency
+// @Tags currencies
+// @Accept json
+// @Produce json
+// @Param id path string true "Currency ID (UUID)"
+// @Param currency body UpdateCurrencyRequest true "Updated currency information"
+// @Success 200 {object} response.Response "Currency updated successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 404 {object} response.Response "Currency not found"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/currencies/{id} [put]
 func (h *CurrencyHTTPHandler) UpdateCurrency(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, err := uuid.Parse(idStr)
@@ -147,6 +220,18 @@ func (h *CurrencyHTTPHandler) UpdateCurrency(c *fiber.Ctx) error {
 }
 
 // ActivateCurrency handles POST /api/v1/currencies/:id/activate
+// @Summary Activate a currency
+// @Description Activate a deactivated currency
+// @Tags currencies
+// @Produce json
+// @Param id path string true "Currency ID (UUID)"
+// @Success 200 {object} response.Response "Currency activated successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 404 {object} response.Response "Currency not found"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/currencies/{id}/activate [post]
 func (h *CurrencyHTTPHandler) ActivateCurrency(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, err := uuid.Parse(idStr)
@@ -162,6 +247,18 @@ func (h *CurrencyHTTPHandler) ActivateCurrency(c *fiber.Ctx) error {
 }
 
 // DeactivateCurrency handles POST /api/v1/currencies/:id/deactivate
+// @Summary Deactivate a currency
+// @Description Deactivate an active currency
+// @Tags currencies
+// @Produce json
+// @Param id path string true "Currency ID (UUID)"
+// @Success 200 {object} response.Response "Currency deactivated successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 404 {object} response.Response "Currency not found"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/currencies/{id}/deactivate [post]
 func (h *CurrencyHTTPHandler) DeactivateCurrency(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, err := uuid.Parse(idStr)
@@ -177,6 +274,18 @@ func (h *CurrencyHTTPHandler) DeactivateCurrency(c *fiber.Ctx) error {
 }
 
 // DeleteCurrency handles DELETE /api/v1/currencies/:id
+// @Summary Delete a currency
+// @Description Delete a currency by ID
+// @Tags currencies
+// @Produce json
+// @Param id path string true "Currency ID (UUID)"
+// @Success 200 {object} response.Response "Currency deleted successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 404 {object} response.Response "Currency not found"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/currencies/{id} [delete]
 func (h *CurrencyHTTPHandler) DeleteCurrency(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, err := uuid.Parse(idStr)

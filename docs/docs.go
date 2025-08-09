@@ -9,15 +9,15 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
+        "termsOfService": "https://github.com/turahe/master-data-rest-api",
         "contact": {
             "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "url": "https://github.com/turahe/master-data-rest-api/issues",
+            "email": "support@turahe.com"
         },
         "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+            "name": "MIT",
+            "url": "https://github.com/turahe/master-data-rest-api/blob/main/LICENSE"
         },
         "version": "{{.Version}}"
     },
@@ -59,19 +59,19 @@ const docTemplate = `{
                     "200": {
                         "description": "API keys retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -100,7 +100,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_adapters_primary_http.CreateAPIKeyRequest"
+                            "$ref": "#/definitions/http.CreateAPIKeyRequest"
                         }
                     }
                 ],
@@ -108,25 +108,25 @@ const docTemplate = `{
                     "201": {
                         "description": "API key created successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -160,31 +160,31 @@ const docTemplate = `{
                     "200": {
                         "description": "API key retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "API key not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -220,7 +220,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_adapters_primary_http.UpdateAPIKeyRequest"
+                            "$ref": "#/definitions/http.UpdateAPIKeyRequest"
                         }
                     }
                 ],
@@ -228,31 +228,31 @@ const docTemplate = `{
                     "200": {
                         "description": "API key updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "API key not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -284,31 +284,31 @@ const docTemplate = `{
                     "200": {
                         "description": "API key deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "API key not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -342,31 +342,31 @@ const docTemplate = `{
                     "200": {
                         "description": "API key activated successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "API key not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -400,31 +400,31 @@ const docTemplate = `{
                     "200": {
                         "description": "API key deactivated successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "API key not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -465,19 +465,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Banks retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -506,7 +506,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_adapters_primary_http.CreateBankRequest"
+                            "$ref": "#/definitions/http.CreateBankRequest"
                         }
                     }
                 ],
@@ -514,25 +514,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Bank created successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -566,25 +566,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Bank retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Bank not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -632,25 +638,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Banks found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -684,31 +690,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Bank retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Bank not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -744,7 +750,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_adapters_primary_http.UpdateBankRequest"
+                            "$ref": "#/definitions/http.UpdateBankRequest"
                         }
                     }
                 ],
@@ -752,31 +758,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Bank updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Bank not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -808,31 +814,556 @@ const docTemplate = `{
                     "200": {
                         "description": "Bank deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Bank not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/currencies": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all currencies with pagination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "currencies"
+                ],
+                "summary": "Get all currencies",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Currencies retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new currency with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "currencies"
+                ],
+                "summary": "Create a new currency",
+                "parameters": [
+                    {
+                        "description": "Currency information",
+                        "name": "currency",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.CreateCurrencyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Currency created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/currencies/active": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all active currencies with pagination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "currencies"
+                ],
+                "summary": "Get active currencies",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Active currencies retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/currencies/search": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Search currencies by name, code, or symbol",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "currencies"
+                ],
+                "summary": "Search currencies",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Currencies found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/currencies/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get a currency by its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "currencies"
+                ],
+                "summary": "Get currency by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Currency ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Currency retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Currency not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update an existing currency",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "currencies"
+                ],
+                "summary": "Update a currency",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Currency ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated currency information",
+                        "name": "currency",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateCurrencyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Currency updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Currency not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a currency by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "currencies"
+                ],
+                "summary": "Delete a currency",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Currency ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Currency deleted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Currency not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/currencies/{id}/activate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Activate a deactivated currency",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "currencies"
+                ],
+                "summary": "Activate a currency",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Currency ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Currency activated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Currency not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/currencies/{id}/deactivate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deactivate an active currency",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "currencies"
+                ],
+                "summary": "Deactivate a currency",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Currency ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Currency deactivated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Currency not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -873,19 +1404,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Geodirectories retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -914,7 +1445,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_adapters_primary_http.CreateGeodirectoryRequest"
+                            "$ref": "#/definitions/http.CreateGeodirectoryRequest"
                         }
                     }
                 ],
@@ -922,25 +1453,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Geodirectory created successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -965,19 +1496,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Nested set rebuilt successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1025,25 +1556,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Geodirectories found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1103,25 +1634,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Geodirectories retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1155,31 +1686,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Geodirectory retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1215,7 +1746,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_adapters_primary_http.UpdateGeodirectoryRequest"
+                            "$ref": "#/definitions/http.UpdateGeodirectoryRequest"
                         }
                     }
                 ],
@@ -1223,31 +1754,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Geodirectory updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1279,31 +1810,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Geodirectory deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1337,31 +1868,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Ancestors retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1415,31 +1946,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Children retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1487,31 +2018,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Descendants retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1545,31 +2076,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Geodirectory with hierarchy retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1607,7 +2138,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_adapters_primary_http.MoveGeodirectoryRequest"
+                            "$ref": "#/definitions/http.MoveGeodirectoryRequest"
                         }
                     }
                 ],
@@ -1615,31 +2146,556 @@ const docTemplate = `{
                     "200": {
                         "description": "Geodirectory moved successfully",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "404": {
                         "description": "Geodirectory not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_turahe_master-data-rest-api_pkg_response.Response"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/languages": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all languages with pagination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "languages"
+                ],
+                "summary": "Get all languages",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Languages retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new language with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "languages"
+                ],
+                "summary": "Create a new language",
+                "parameters": [
+                    {
+                        "description": "Language information",
+                        "name": "language",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.CreateLanguageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Language created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/languages/active": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all active languages with pagination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "languages"
+                ],
+                "summary": "Get active languages",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Active languages retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/languages/search": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Search languages by name or code",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "languages"
+                ],
+                "summary": "Search languages",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 50,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Languages found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/languages/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get a language by its UUID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "languages"
+                ],
+                "summary": "Get language by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Language ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Language retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Language not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update an existing language",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "languages"
+                ],
+                "summary": "Update a language",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Language ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated language information",
+                        "name": "language",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/http.UpdateLanguageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Language updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Language not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete a language by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "languages"
+                ],
+                "summary": "Delete a language",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Language ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Language deleted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Language not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/languages/{id}/activate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Activate a deactivated language",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "languages"
+                ],
+                "summary": "Activate a language",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Language ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Language activated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Language not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/languages/{id}/deactivate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deactivate an active language",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "languages"
+                ],
+                "summary": "Deactivate a language",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Language ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Language deactivated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Language not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1647,22 +2703,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_turahe_master-data-rest-api_pkg_response.Response": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "error": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "internal_adapters_primary_http.CreateAPIKeyRequest": {
+        "http.CreateAPIKeyRequest": {
             "type": "object",
             "required": [
                 "name"
@@ -1680,7 +2721,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_adapters_primary_http.CreateBankRequest": {
+        "http.CreateBankRequest": {
             "type": "object",
             "required": [
                 "alias",
@@ -1703,7 +2744,29 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_adapters_primary_http.CreateGeodirectoryRequest": {
+        "http.CreateCurrencyRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "name"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "decimal_places": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "name": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.CreateGeodirectoryRequest": {
             "type": "object",
             "required": [
                 "name",
@@ -1733,7 +2796,22 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_adapters_primary_http.MoveGeodirectoryRequest": {
+        "http.CreateLanguageRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "name"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.MoveGeodirectoryRequest": {
             "type": "object",
             "required": [
                 "new_parent_id"
@@ -1744,7 +2822,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_adapters_primary_http.UpdateAPIKeyRequest": {
+        "http.UpdateAPIKeyRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -1759,7 +2837,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_adapters_primary_http.UpdateBankRequest": {
+        "http.UpdateBankRequest": {
             "type": "object",
             "properties": {
                 "alias": {
@@ -1776,7 +2854,24 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_adapters_primary_http.UpdateGeodirectoryRequest": {
+        "http.UpdateCurrencyRequest": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "decimal_places": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "http.UpdateGeodirectoryRequest": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1795,11 +2890,37 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "http.UpdateLanguageRequest": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Response": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
         }
     },
     "securityDefinitions": {
         "ApiKeyAuth": {
-            "description": "Type \"Bearer\" followed by a space and API key.",
+            "description": "Enter your API key in the format: Bearer YOUR_API_KEY",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
@@ -1809,12 +2930,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "1.0.0",
 	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Master Data REST API",
-	Description:      "A REST API for managing master data including countries, provinces, cities, districts, villages, banks, currencies, and languages.",
+	Description:      "A comprehensive REST API for managing master data including geographical information, banks, currencies, and languages. Built with Go, Fiber, and PostgreSQL using Hexagonal Architecture.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

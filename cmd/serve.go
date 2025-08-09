@@ -1,3 +1,39 @@
+// Package cmd provides command-line interface for the Master Data REST API
+//
+// @title Master Data REST API
+// @version 1.0.0
+// @description A comprehensive REST API for managing master data including geographical information, banks, currencies, and languages. Built with Go, Fiber, and PostgreSQL using Hexagonal Architecture.
+// @termsOfService https://github.com/turahe/master-data-rest-api
+//
+// @contact.name API Support
+// @contact.url https://github.com/turahe/master-data-rest-api/issues
+// @contact.email support@turahe.com
+//
+// @license.name MIT
+// @license.url https://github.com/turahe/master-data-rest-api/blob/main/LICENSE
+//
+// @host localhost:8080
+// @BasePath /api/v1
+//
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @description Enter your API key in the format: Bearer YOUR_API_KEY
+//
+// @tag.name geodirectories
+// @tag.description Operations for managing geographical directories (countries, provinces, cities, districts, villages)
+//
+// @tag.name banks
+// @tag.description Operations for managing bank information
+//
+// @tag.name currencies
+// @tag.description Operations for managing currency information
+//
+// @tag.name languages
+// @tag.description Operations for managing language information
+//
+// @tag.name api-keys
+// @tag.description Operations for managing API keys and authentication
 package cmd
 
 import (

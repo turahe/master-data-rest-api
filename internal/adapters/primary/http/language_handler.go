@@ -25,6 +25,18 @@ func NewLanguageHTTPHandler(languageService *services.LanguageService, searchSer
 }
 
 // CreateLanguage handles POST /api/v1/languages
+// @Summary Create a new language
+// @Description Create a new language with the provided information
+// @Tags languages
+// @Accept json
+// @Produce json
+// @Param language body CreateLanguageRequest true "Language information"
+// @Success 201 {object} response.Response "Language created successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/languages [post]
 func (h *LanguageHTTPHandler) CreateLanguage(c *fiber.Ctx) error {
 	var req CreateLanguageRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -40,6 +52,18 @@ func (h *LanguageHTTPHandler) CreateLanguage(c *fiber.Ctx) error {
 }
 
 // GetLanguageByID handles GET /api/v1/languages/:id
+// @Summary Get language by ID
+// @Description Get a language by its UUID
+// @Tags languages
+// @Produce json
+// @Param id path string true "Language ID (UUID)"
+// @Success 200 {object} response.Response "Language retrieved successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 404 {object} response.Response "Language not found"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/languages/{id} [get]
 func (h *LanguageHTTPHandler) GetLanguageByID(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, err := uuid.Parse(idStr)
@@ -56,6 +80,17 @@ func (h *LanguageHTTPHandler) GetLanguageByID(c *fiber.Ctx) error {
 }
 
 // GetAllLanguages handles GET /api/v1/languages
+// @Summary Get all languages
+// @Description Get all languages with pagination
+// @Tags languages
+// @Produce json
+// @Param limit query int false "Limit" default(50)
+// @Param offset query int false "Offset" default(0)
+// @Success 200 {object} response.Response "Languages retrieved successfully"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/languages [get]
 func (h *LanguageHTTPHandler) GetAllLanguages(c *fiber.Ctx) error {
 	limit, _ := strconv.Atoi(c.Query("limit", "50"))
 	offset, _ := strconv.Atoi(c.Query("offset", "0"))
@@ -69,6 +104,17 @@ func (h *LanguageHTTPHandler) GetAllLanguages(c *fiber.Ctx) error {
 }
 
 // GetActiveLanguages handles GET /api/v1/languages/active
+// @Summary Get active languages
+// @Description Get all active languages with pagination
+// @Tags languages
+// @Produce json
+// @Param limit query int false "Limit" default(50)
+// @Param offset query int false "Offset" default(0)
+// @Success 200 {object} response.Response "Active languages retrieved successfully"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/languages/active [get]
 func (h *LanguageHTTPHandler) GetActiveLanguages(c *fiber.Ctx) error {
 	limit, _ := strconv.Atoi(c.Query("limit", "50"))
 	offset, _ := strconv.Atoi(c.Query("offset", "0"))
@@ -82,6 +128,19 @@ func (h *LanguageHTTPHandler) GetActiveLanguages(c *fiber.Ctx) error {
 }
 
 // SearchLanguages handles GET /api/v1/languages/search
+// @Summary Search languages
+// @Description Search languages by name or code
+// @Tags languages
+// @Produce json
+// @Param q query string true "Search query"
+// @Param limit query int false "Limit" default(50)
+// @Param offset query int false "Offset" default(0)
+// @Success 200 {object} response.Response "Languages found"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/languages/search [get]
 func (h *LanguageHTTPHandler) SearchLanguages(c *fiber.Ctx) error {
 	query := c.Query("q")
 	if query == "" {
@@ -100,6 +159,20 @@ func (h *LanguageHTTPHandler) SearchLanguages(c *fiber.Ctx) error {
 }
 
 // UpdateLanguage handles PUT /api/v1/languages/:id
+// @Summary Update a language
+// @Description Update an existing language
+// @Tags languages
+// @Accept json
+// @Produce json
+// @Param id path string true "Language ID (UUID)"
+// @Param language body UpdateLanguageRequest true "Updated language information"
+// @Success 200 {object} response.Response "Language updated successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 404 {object} response.Response "Language not found"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/languages/{id} [put]
 func (h *LanguageHTTPHandler) UpdateLanguage(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, err := uuid.Parse(idStr)
@@ -133,6 +206,18 @@ func (h *LanguageHTTPHandler) UpdateLanguage(c *fiber.Ctx) error {
 }
 
 // ActivateLanguage handles POST /api/v1/languages/:id/activate
+// @Summary Activate a language
+// @Description Activate a deactivated language
+// @Tags languages
+// @Produce json
+// @Param id path string true "Language ID (UUID)"
+// @Success 200 {object} response.Response "Language activated successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 404 {object} response.Response "Language not found"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/languages/{id}/activate [post]
 func (h *LanguageHTTPHandler) ActivateLanguage(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, err := uuid.Parse(idStr)
@@ -148,6 +233,18 @@ func (h *LanguageHTTPHandler) ActivateLanguage(c *fiber.Ctx) error {
 }
 
 // DeactivateLanguage handles POST /api/v1/languages/:id/deactivate
+// @Summary Deactivate a language
+// @Description Deactivate an active language
+// @Tags languages
+// @Produce json
+// @Param id path string true "Language ID (UUID)"
+// @Success 200 {object} response.Response "Language deactivated successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 404 {object} response.Response "Language not found"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/languages/{id}/deactivate [post]
 func (h *LanguageHTTPHandler) DeactivateLanguage(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, err := uuid.Parse(idStr)
@@ -163,6 +260,18 @@ func (h *LanguageHTTPHandler) DeactivateLanguage(c *fiber.Ctx) error {
 }
 
 // DeleteLanguage handles DELETE /api/v1/languages/:id
+// @Summary Delete a language
+// @Description Delete a language by ID
+// @Tags languages
+// @Produce json
+// @Param id path string true "Language ID (UUID)"
+// @Success 200 {object} response.Response "Language deleted successfully"
+// @Failure 400 {object} response.Response "Bad request"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Failure 404 {object} response.Response "Language not found"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Security ApiKeyAuth
+// @Router /api/v1/languages/{id} [delete]
 func (h *LanguageHTTPHandler) DeleteLanguage(c *fiber.Ctx) error {
 	idStr := c.Params("id")
 	id, err := uuid.Parse(idStr)

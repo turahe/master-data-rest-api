@@ -233,7 +233,7 @@ jobs:
 
     - name: Create test environment file
       run: |
-        cp .env.example .env
+        cp env.example .env
         echo "DB_PASSWORD=postgres123" >> .env
         echo "MEILISEARCH_API_KEY=testkey123" >> .env
 

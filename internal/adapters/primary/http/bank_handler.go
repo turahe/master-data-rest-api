@@ -153,6 +153,7 @@ func (h *BankHTTPHandler) SearchBanks(c *fiber.Ctx) error {
 // @Produce json
 // @Param code path string true "Bank Code"
 // @Success 200 {object} response.Response "Bank retrieved successfully"
+// @Failure 400 {object} response.Response "Bad request"
 // @Failure 401 {object} response.Response "Unauthorized"
 // @Failure 404 {object} response.Response "Bank not found"
 // @Failure 500 {object} response.Response "Internal server error"
