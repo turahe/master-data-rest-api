@@ -9,11 +9,12 @@ import (
 
 // Config holds all configuration for the application
 type Config struct {
-	App      AppConfig
-	Database DatabaseConfig
-	Server   ServerConfig
-	Auth     AuthConfig
-	Logging  LoggingConfig
+	App         AppConfig
+	Database    DatabaseConfig
+	Server      ServerConfig
+	Auth        AuthConfig
+	Logging     LoggingConfig
+	Meilisearch MeilisearchConfig
 }
 
 // AppConfig holds application-specific configuration
@@ -64,6 +65,12 @@ type LoggingConfig struct {
 	Output string
 }
 
+// MeilisearchConfig holds Meilisearch configuration
+type MeilisearchConfig struct {
+	Host   string
+	APIKey string
+}
+
 // Load loads configuration from environment variables
 func Load() *Config {
 	return &Config{
@@ -103,6 +110,10 @@ func Load() *Config {
 			Level:  getEnv("LOG_LEVEL", "info"),
 			Format: getEnv("LOG_FORMAT", "text"),
 			Output: getEnv("LOG_OUTPUT", "stdout"),
+		},
+		Meilisearch: MeilisearchConfig{
+			Host:   getEnv("MEILISEARCH_HOST", "http://localhost:7700"),
+			APIKey: getEnv("MEILISEARCH_API_KEY", ""),
 		},
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/turahe/master-data-rest-api/internal/adapters/primary/http/middleware"
 	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database"
 	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database/pgx"
+	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/search"
 	"github.com/turahe/master-data-rest-api/internal/domain/services"
 	"github.com/turahe/master-data-rest-api/pkg/logger"
 	"github.com/turahe/master-data-rest-api/pkg/response"
@@ -97,6 +98,14 @@ func runServer(cmd *cobra.Command) error {
 	currencyRepo := pgx.NewCurrencyRepository(dbConnection.GetPool())
 	languageRepo := pgx.NewLanguageRepository(dbConnection.GetPool())
 
+	// Initialize search service
+	log.Info("Initializing search service")
+	meilisearchClient := search.NewMeilisearchClient(search.Config{
+		Host:   config.Meilisearch.Host,
+		APIKey: config.Meilisearch.APIKey,
+	})
+	searchService := search.NewMeilisearchRepository(meilisearchClient)
+
 	// Initialize services
 	log.Info("Initializing services")
 	geodirectoryService := services.NewGeodirectoryService(geodirectoryRepo)
@@ -107,11 +116,11 @@ func runServer(cmd *cobra.Command) error {
 
 	// Initialize handlers
 	log.Info("Initializing HTTP handlers")
-	geodirectoryHandler := http.NewGeodirectoryHTTPHandler(geodirectoryService)
+	geodirectoryHandler := http.NewGeodirectoryHTTPHandler(geodirectoryService, searchService)
 	apiKeyHandler := http.NewAPIKeyHTTPHandler(apiKeyService)
-	bankHandler := http.NewBankHTTPHandler(bankService)
-	currencyHandler := http.NewCurrencyHTTPHandler(currencyService)
-	languageHandler := http.NewLanguageHTTPHandler(languageService)
+	bankHandler := http.NewBankHTTPHandler(bankService, searchService)
+	currencyHandler := http.NewCurrencyHTTPHandler(currencyService, searchService)
+	languageHandler := http.NewLanguageHTTPHandler(languageService, searchService)
 
 	// Setup router
 	app := setupRouter(config, log, geodirectoryHandler, apiKeyHandler, bankHandler, currencyHandler, languageHandler, apiKeyService, geodirectoryService)

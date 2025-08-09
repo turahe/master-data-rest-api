@@ -33,8 +33,11 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-apppassword}
       DB_DRIVER: ${DB_DRIVER:-postgres}
       DB_SSL_MODE: ${DB_SSL_MODE:-disable}
+      MEILISEARCH_HOST: ${MEILISEARCH_HOST:-http://meilisearch:7700}
+      MEILISEARCH_API_KEY: ${MEILISEARCH_API_KEY:-masterKey123}
     depends_on:
       - postgres
+      - meilisearch
     networks:
       - master_data_network
 
@@ -47,6 +50,22 @@ services:
       - "6379:6379"
     volumes:
       - ./data/redis:/data
+    networks:
+      - master_data_network
+
+  # Meilisearch (for search functionality)
+  meilisearch:
+    image: getmeili/meilisearch:v1.5
+    container_name: master_data_meilisearch
+    restart: unless-stopped
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_MASTER_KEY: ${MEILISEARCH_API_KEY:-masterKey123}
+      MEILI_ENV: ${MEILI_ENV:-development}
+      MEILI_HTTP_ADDR: 0.0.0.0:7700
+    volumes:
+      - ./data/meilisearch:/meili_data
     networks:
       - master_data_network
 

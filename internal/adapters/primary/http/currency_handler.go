@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/turahe/master-data-rest-api/internal/domain/repositories"
 	"github.com/turahe/master-data-rest-api/internal/domain/services"
 	"github.com/turahe/master-data-rest-api/pkg/response"
 )
@@ -12,12 +13,14 @@ import (
 // CurrencyHTTPHandler handles HTTP requests for currency operations
 type CurrencyHTTPHandler struct {
 	currencyService *services.CurrencyService
+	searchService   repositories.SearchRepository
 }
 
 // NewCurrencyHTTPHandler creates a new CurrencyHTTPHandler instance
-func NewCurrencyHTTPHandler(currencyService *services.CurrencyService) *CurrencyHTTPHandler {
+func NewCurrencyHTTPHandler(currencyService *services.CurrencyService, searchService repositories.SearchRepository) *CurrencyHTTPHandler {
 	return &CurrencyHTTPHandler{
 		currencyService: currencyService,
+		searchService:   searchService,
 	}
 }
 

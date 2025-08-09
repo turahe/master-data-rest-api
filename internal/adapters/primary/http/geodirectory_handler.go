@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/turahe/master-data-rest-api/internal/domain/entities"
+	"github.com/turahe/master-data-rest-api/internal/domain/repositories"
 	"github.com/turahe/master-data-rest-api/internal/domain/services"
 	"github.com/turahe/master-data-rest-api/pkg/response"
 )
@@ -13,12 +14,14 @@ import (
 // GeodirectoryHTTPHandler handles HTTP requests for geodirectory operations
 type GeodirectoryHTTPHandler struct {
 	geodirectoryService *services.GeodirectoryService
+	searchService       repositories.SearchRepository
 }
 
 // NewGeodirectoryHTTPHandler creates a new GeodirectoryHTTPHandler instance
-func NewGeodirectoryHTTPHandler(geodirectoryService *services.GeodirectoryService) *GeodirectoryHTTPHandler {
+func NewGeodirectoryHTTPHandler(geodirectoryService *services.GeodirectoryService, searchService repositories.SearchRepository) *GeodirectoryHTTPHandler {
 	return &GeodirectoryHTTPHandler{
 		geodirectoryService: geodirectoryService,
+		searchService:       searchService,
 	}
 }
 

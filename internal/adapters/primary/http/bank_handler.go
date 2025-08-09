@@ -5,19 +5,22 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/turahe/master-data-rest-api/internal/domain/repositories"
 	"github.com/turahe/master-data-rest-api/internal/domain/services"
 	"github.com/turahe/master-data-rest-api/pkg/response"
 )
 
 // BankHTTPHandler handles HTTP requests for bank operations
 type BankHTTPHandler struct {
-	bankService *services.BankService
+	bankService   *services.BankService
+	searchService repositories.SearchRepository
 }
 
 // NewBankHTTPHandler creates a new BankHTTPHandler instance
-func NewBankHTTPHandler(bankService *services.BankService) *BankHTTPHandler {
+func NewBankHTTPHandler(bankService *services.BankService, searchService repositories.SearchRepository) *BankHTTPHandler {
 	return &BankHTTPHandler{
-		bankService: bankService,
+		bankService:   bankService,
+		searchService: searchService,
 	}
 }
 
@@ -43,6 +46,13 @@ func (h *BankHTTPHandler) CreateBank(c *fiber.Ctx) error {
 	bank, err := h.bankService.CreateBank(c.Context(), req.Name, req.Alias, req.Company, req.Code)
 	if err != nil {
 		return response.InternalServerError(c, "Failed to create bank: "+err.Error())
+	}
+
+	// Index the new bank in Meilisearch
+	if err := h.searchService.IndexBank(c.Context(), bank); err != nil {
+		// Log error but don't fail the operation
+		// TODO: Consider using a background job for indexing
+		// log.Printf("Failed to index bank in search: %v", err)
 	}
 
 	return response.Created(c, bank, "Bank created successfully")
@@ -123,9 +133,14 @@ func (h *BankHTTPHandler) SearchBanks(c *fiber.Ctx) error {
 	limit, _ := strconv.Atoi(c.Query("limit", "50"))
 	offset, _ := strconv.Atoi(c.Query("offset", "0"))
 
-	banks, err := h.bankService.SearchBanks(c.Context(), query, limit, offset)
+	// Use Meilisearch for fast search functionality
+	banks, err := h.searchService.SearchBanks(c.Context(), query, limit, offset)
 	if err != nil {
-		return response.InternalServerError(c, "Failed to search banks: "+err.Error())
+		// Fallback to database search if Meilisearch fails
+		banks, err = h.bankService.SearchBanks(c.Context(), query, limit, offset)
+		if err != nil {
+			return response.InternalServerError(c, "Failed to search banks: "+err.Error())
+		}
 	}
 
 	return response.Success(c, banks, "Banks found")

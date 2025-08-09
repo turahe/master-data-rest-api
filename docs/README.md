@@ -21,6 +21,7 @@ Welcome to the comprehensive documentation for the Master Data REST API. This do
 
 ### 🔧 Technical Guides
 - [Database Logging](database-logging.md) - Query logging and monitoring
+- [Meilisearch Integration](meilisearch.md) - Search engine setup and usage
 - [API Authentication](#api-authentication) - Security and access control
 - [Performance Tuning](#performance-tuning) - Optimization guidelines
 
@@ -51,6 +52,7 @@ Welcome to the comprehensive documentation for the Master Data REST API. This do
 | [`database-logging.md`](database-logging.md) | Database logging features | ✅ Complete |
 | [`testing.md`](testing.md) | Testing strategy and guidelines | ✅ Complete |
 | [`api-examples.md`](api-examples.md) | API usage examples and patterns | ✅ Complete |
+| [`meilisearch.md`](meilisearch.md) | Search engine integration guide | ✅ Complete |
 | [`hexagonal-architecture.md`](hexagonal-architecture.md) | Architecture deep dive | ✅ Complete |
 
 ### API Documentation

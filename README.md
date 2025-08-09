@@ -19,6 +19,7 @@ A modern, high-performance REST API built with **Go** and **Hexagonal Architectu
 - 📊 **Database Logging** - Comprehensive query logging with performance metrics
 - 🚀 **High Performance** - Built with Fiber v2 and pgx for optimal speed
 - 📖 **Auto-Generated Documentation** - Swagger/OpenAPI 3.0 compliant
+- 🔍 **Powered by Meilisearch** - Fast, typo-tolerant search engine integration
 - 🐳 **Docker Ready** - Available on [Docker Hub](https://hub.docker.com/r/turahe/master-data-rest-api)
 
 ## 📋 Table of Contents
@@ -39,6 +40,7 @@ A modern, high-performance REST API built with **Go** and **Hexagonal Architectu
 
 - **Go 1.21+** - [Install Go](https://golang.org/dl/)
 - **PostgreSQL 13+** - [Install PostgreSQL](https://www.postgresql.org/download/)
+- **Meilisearch 1.5+** - [Install Meilisearch](https://www.meilisearch.com/docs/learn/getting_started/installation)
 - **Docker** (optional) - [Install Docker](https://docs.docker.com/get-docker/)
 
 ### Quick Start with Docker (Recommended)
@@ -190,7 +192,8 @@ master-data-rest-api/
 │       ├── primary/       # Incoming adapters
 │       │   └── http/      # HTTP handlers (Fiber)
 │       └── secondary/     # Outgoing adapters
-│           └── database/  # Database implementations (pgx)
+│           ├── database/  # Database implementations (pgx)
+│           └── search/    # Search implementations (Meilisearch)
 ├── pkg/                   # Shared packages
 │   ├── logger/           # Structured logging
 │   └── response/         # HTTP response utilities
@@ -317,6 +320,21 @@ The application features a modern CLI built with Cobra:
 ./master-data-api seed --clear
 ```
 
+### Search Index Management
+```bash
+# Initialize search indexes
+./master-data-api search init
+
+# Reindex all data
+./master-data-api search reindex
+
+# Check search service health
+./master-data-api search health
+
+# View search statistics
+./master-data-api search stats
+```
+
 For detailed CLI usage, see [CLI Documentation](docs/cli-usage.md).
 
 ## ⚙️ Configuration
@@ -351,6 +369,10 @@ DB_LOG_SLOW_QUERY=100ms
 LOG_LEVEL=info
 LOG_FORMAT=text
 LOG_OUTPUT=stdout
+
+# Meilisearch
+MEILISEARCH_HOST=http://localhost:7700
+MEILISEARCH_API_KEY=masterKey123
 ```
 
 ### Configuration Details
@@ -363,6 +385,8 @@ LOG_OUTPUT=stdout
 | `DB_LOG_QUERIES` | Enable query logging | `true` |
 | `DB_LOG_SLOW_QUERY` | Slow query threshold | `100ms` |
 | `LOG_FORMAT` | Log format (text/json) | `text` |
+| `MEILISEARCH_HOST` | Meilisearch server URL | `http://localhost:7700` |
+| `MEILISEARCH_API_KEY` | Meilisearch API key | `` |
 
 ## 💻 Development
 
@@ -459,6 +483,7 @@ graph LR
     subgraph Production ["🚀 Production"]
         Docker[🐳 Docker Engine]
         PostgreSQL[🐘 PostgreSQL]
+        Meilisearch[🔍 Meilisearch]
         App[📱 API Application]
     end
 
@@ -468,6 +493,7 @@ graph LR
     DockerHub --> Docker
     Docker --> App
     PostgreSQL --> App
+    Meilisearch --> App
 
     classDef dev fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
     classDef registry fill:#fff3e0,stroke:#f57c00,stroke-width:2px

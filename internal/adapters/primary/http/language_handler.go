@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/turahe/master-data-rest-api/internal/domain/repositories"
 	"github.com/turahe/master-data-rest-api/internal/domain/services"
 	"github.com/turahe/master-data-rest-api/pkg/response"
 )
@@ -12,12 +13,14 @@ import (
 // LanguageHTTPHandler handles HTTP requests for language operations
 type LanguageHTTPHandler struct {
 	languageService *services.LanguageService
+	searchService   repositories.SearchRepository
 }
 
 // NewLanguageHTTPHandler creates a new LanguageHTTPHandler instance
-func NewLanguageHTTPHandler(languageService *services.LanguageService) *LanguageHTTPHandler {
+func NewLanguageHTTPHandler(languageService *services.LanguageService, searchService repositories.SearchRepository) *LanguageHTTPHandler {
 	return &LanguageHTTPHandler{
 		languageService: languageService,
+		searchService:   searchService,
 	}
 }
 
