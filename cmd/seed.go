@@ -2,16 +2,12 @@ package cmd
 
 import (
 	"context"
-	"encoding/csv"
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database"
 	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database/pgx"
-	"github.com/turahe/master-data-rest-api/internal/domain/entities"
+	"github.com/turahe/master-data-rest-api/internal/seeders"
 )
 
 var (
@@ -76,6 +72,7 @@ func init() {
 func runSeeder() error {
 	config := GetConfig()
 	log := GetLogger()
+	ctx := context.Background()
 
 	log.Info("Starting seeder application")
 
@@ -106,6 +103,15 @@ func runSeeder() error {
 	currencyRepo := pgx.NewCurrencyRepository(dbConnection.GetPool())
 	languageRepo := pgx.NewLanguageRepository(dbConnection.GetPool())
 
+	// Initialize seeder manager
+	seederManager := seeders.NewSeederManager(
+		geodirectoryRepo,
+		bankRepo,
+		currencyRepo,
+		languageRepo,
+		log,
+	)
+
 	log.WithFields(map[string]interface{}{
 		"data_dir":   dataDir,
 		"clear_data": clearData,
@@ -121,47 +127,18 @@ func runSeeder() error {
 	// Clear data if requested
 	if clearData && !seedOnly {
 		log.Info("Clearing existing data")
-		if err := clearAllData(geodirectoryRepo, bankRepo, currencyRepo, languageRepo); err != nil {
+		if err := seederManager.Clear(ctx, seedName); err != nil {
 			log.WithError(err).Error("Failed to clear data")
 			return fmt.Errorf("failed to clear data: %w", err)
 		}
 		log.Info("Data cleared successfully")
 	}
 
-	// Perform seeding based on seedName flag
-	if seedName != "" {
-		switch strings.ToLower(seedName) {
-		case "languages":
-			if err := seedLanguages(languageRepo, dataDir); err != nil {
-				log.WithError(err).Error("Failed to seed languages")
-				return fmt.Errorf("failed to seed languages: %w", err)
-			}
-		case "banks":
-			if err := seedBanks(bankRepo, dataDir); err != nil {
-				log.WithError(err).Error("Failed to seed banks")
-				return fmt.Errorf("failed to seed banks: %w", err)
-			}
-		case "currencies":
-			if err := seedCurrencies(currencyRepo, dataDir); err != nil {
-				log.WithError(err).Error("Failed to seed currencies")
-				return fmt.Errorf("failed to seed currencies: %w", err)
-			}
-		case "geodirectories":
-			if err := seedGeodirectories(geodirectoryRepo, dataDir); err != nil {
-				log.WithError(err).Error("Failed to seed geodirectories")
-				return fmt.Errorf("failed to seed geodirectories: %w", err)
-			}
-		default:
-			return fmt.Errorf("unsupported seed type: %s. Available types: languages, banks, currencies, geodirectories", seedName)
-		}
-		fmt.Printf("✅ Successfully seeded %s data!\n", seedName)
-	} else {
-		// Seed all data types
-		if err := seedAllData(geodirectoryRepo, bankRepo, currencyRepo, languageRepo, dataDir); err != nil {
-			log.WithError(err).Error("Failed to seed all data")
-			return fmt.Errorf("failed to seed all data: %w", err)
-		}
-		fmt.Println("✅ Successfully seeded all data!")
+	// Perform seeding
+	log.Info("Starting seeding process")
+	if err := seederManager.Seed(ctx, dataDir, seedName); err != nil {
+		log.WithError(err).Error("Failed to seed data")
+		return fmt.Errorf("failed to seed data: %w", err)
 	}
 
 	fmt.Printf("📁 Data directory: %s\n", dataDir)
@@ -172,210 +149,6 @@ func runSeeder() error {
 		fmt.Println("🎯 Seeded: all data types")
 	}
 
-	return nil
-}
-
-func clearAllData(geodirectoryRepo *pgx.GeodirectoryRepository, bankRepo *pgx.BankRepository, currencyRepo *pgx.CurrencyRepository, languageRepo *pgx.LanguageRepository) error {
-	log := GetLogger()
-	ctx := context.Background()
-	
-	log.Warn("Clearing all data from database...")
-	
-	// Clear languages
-	if err := clearLanguagesData(languageRepo, ctx); err != nil {
-		return fmt.Errorf("failed to clear languages: %w", err)
-	}
-	
-	// TODO: Add clearing logic for other data types when their seeders are implemented
-	// Clear banks, currencies, geodirectories...
-	
-	log.Info("All data cleared successfully")
-	return nil
-}
-
-// clearLanguagesData removes all languages from the database
-func clearLanguagesData(languageRepo *pgx.LanguageRepository, ctx context.Context) error {
-	log := GetLogger()
-	
-	// Get all languages first to count them
-	languages, err := languageRepo.GetAll(ctx, 10000, 0) // Get up to 10k records with 0 offset
-	if err != nil {
-		return fmt.Errorf("failed to get languages for clearing: %w", err)
-	}
-	
-	log.WithField("count", len(languages)).Info("Clearing existing languages")
-	
-	for _, language := range languages {
-		if err := languageRepo.Delete(ctx, language.ID); err != nil {
-			log.WithError(err).WithField("id", language.ID).Warn("Failed to delete language")
-			// Continue with others even if one fails
-		}
-	}
-	
-	log.WithField("count", len(languages)).Info("Languages cleared successfully")
-	return nil
-}
-
-// seedLanguages reads and imports language data from CSV file
-func seedLanguages(languageRepo *pgx.LanguageRepository, dataDir string) error {
-	log := GetLogger()
-	ctx := context.Background()
-
-	// Read languages from CSV file
-	csvFile := filepath.Join(dataDir, "tm_languages.csv")
-	log.WithField("file", csvFile).Info("Reading languages from CSV file")
-
-	file, err := os.Open(csvFile)
-	if err != nil {
-		return fmt.Errorf("failed to open languages CSV file: %w", err)
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
-	records, err := reader.ReadAll()
-	if err != nil {
-		return fmt.Errorf("failed to read CSV records: %w", err)
-	}
-
-	if len(records) == 0 {
-		return fmt.Errorf("no records found in CSV file")
-	}
-
-	// Skip header row
-	if len(records) > 1 {
-		records = records[1:]
-	}
-
-	log.WithField("count", len(records)).Info("Processing language records")
-
-	successCount := 0
-	errorCount := 0
-
-	for i, record := range records {
-		if len(record) < 3 {
-			log.WithField("row", i+2).Warn("Skipping row with insufficient columns")
-			errorCount++
-			continue
-		}
-
-		code := strings.TrimSpace(record[0])
-		name := strings.TrimSpace(record[1])
-		_ = strings.TrimSpace(record[2]) // native name - not used in current entity
-
-		if code == "" || name == "" {
-			log.WithField("row", i+2).Warn("Skipping row with empty code or name")
-			errorCount++
-			continue
-		}
-
-		// Create language entity
-		language := entities.NewLanguage(name, code)
-
-		// Check if language already exists
-		existing, getErr := languageRepo.GetByCode(ctx, code)
-		if getErr != nil {
-			// Language doesn't exist, create new one
-			err = languageRepo.Create(ctx, language)
-			if err != nil {
-				log.WithError(err).WithFields(map[string]interface{}{
-					"row":  i + 2,
-					"code": code,
-					"name": name,
-				}).Warn("Failed to create language")
-				errorCount++
-				continue
-			}
-		} else {
-			// Language exists, update it
-			existing.SetName(name)
-			updateErr := languageRepo.Update(ctx, existing)
-			if updateErr != nil {
-				log.WithError(updateErr).WithFields(map[string]interface{}{
-					"row":  i + 2,
-					"code": code,
-					"name": name,
-				}).Warn("Failed to update existing language")
-				errorCount++
-				continue
-			}
-		}
-
-		successCount++
-		if successCount%50 == 0 {
-			log.WithField("processed", successCount).Info("Language seeding progress")
-		}
-	}
-
-	log.WithFields(map[string]interface{}{
-		"success": successCount,
-		"errors":  errorCount,
-		"total":   len(records),
-	}).Info("Language seeding completed")
-
-	fmt.Printf("📊 Processed %d language records: %d success, %d errors\n", len(records), successCount, errorCount)
-
-	return nil
-}
-
-// seedBanks reads and imports bank data from CSV file
-func seedBanks(bankRepo *pgx.BankRepository, dataDir string) error {
-	log := GetLogger()
-
-	csvFile := filepath.Join(dataDir, "tm_banks.csv")
-	log.WithField("file", csvFile).Info("Banks seeding would be implemented here")
-
-	// TODO: Implement banks CSV reading and seeding
-	fmt.Println("🏦 Banks seeding implementation pending")
-	return nil
-}
-
-// seedCurrencies reads and imports currency data from CSV file
-func seedCurrencies(currencyRepo *pgx.CurrencyRepository, dataDir string) error {
-	log := GetLogger()
-
-	csvFile := filepath.Join(dataDir, "tm_currencies.csv")
-	log.WithField("file", csvFile).Info("Currencies seeding would be implemented here")
-
-	// TODO: Implement currencies CSV reading and seeding
-	fmt.Println("💰 Currencies seeding implementation pending")
-	return nil
-}
-
-// seedGeodirectories reads and imports geodirectory data from JSON files
-func seedGeodirectories(geodirectoryRepo *pgx.GeodirectoryRepository, dataDir string) error {
-	log := GetLogger()
-
-	geoDir := filepath.Join(dataDir, "geodirectories")
-	log.WithField("directory", geoDir).Info("Geodirectories seeding would be implemented here")
-
-	// TODO: Implement geodirectories JSON reading and seeding
-	fmt.Println("🌍 Geodirectories seeding implementation pending")
-	return nil
-}
-
-// seedAllData seeds all available data types
-func seedAllData(geodirectoryRepo *pgx.GeodirectoryRepository, bankRepo *pgx.BankRepository, currencyRepo *pgx.CurrencyRepository, languageRepo *pgx.LanguageRepository, dataDir string) error {
-	log := GetLogger()
-
-	log.Info("Seeding all data types")
-
-	// Seed languages first
-	if err := seedLanguages(languageRepo, dataDir); err != nil {
-		return fmt.Errorf("failed to seed languages: %w", err)
-	}
-
-	// Seed other data types
-	if err := seedBanks(bankRepo, dataDir); err != nil {
-		return fmt.Errorf("failed to seed banks: %w", err)
-	}
-
-	if err := seedCurrencies(currencyRepo, dataDir); err != nil {
-		return fmt.Errorf("failed to seed currencies: %w", err)
-	}
-
-	if err := seedGeodirectories(geodirectoryRepo, dataDir); err != nil {
-		return fmt.Errorf("failed to seed geodirectories: %w", err)
-	}
-
+	fmt.Println("✅ Seeding completed successfully!")
 	return nil
 }
