@@ -335,6 +335,10 @@ air
 # Run tests
 make test
 make test-coverage
+make test-short  # Faster tests
+make test-clean  # Clean test cache
+
+# See docs/testing.md for detailed testing guide
 
 # Code quality
 make lint

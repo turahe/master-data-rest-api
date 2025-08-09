@@ -49,6 +49,7 @@ Welcome to the comprehensive documentation for the Master Data REST API. This do
 | [`installation.md`](installation.md) | Detailed installation guide | ✅ Complete |
 | [`cli-usage.md`](cli-usage.md) | CLI command reference | ✅ Complete |
 | [`database-logging.md`](database-logging.md) | Database logging features | ✅ Complete |
+| [`testing.md`](testing.md) | Testing strategy and guidelines | ✅ Complete |
 | [`api-examples.md`](api-examples.md) | API usage examples and patterns | ✅ Complete |
 | [`hexagonal-architecture.md`](hexagonal-architecture.md) | Architecture deep dive | ✅ Complete |
 

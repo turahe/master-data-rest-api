@@ -1,4 +1,4 @@
-.PHONY: help build build-windows build-linux build-darwin build-all run test clean migrate-up migrate-down lint format docker-build docker-run
+.PHONY: help build build-windows build-linux build-darwin build-all run test test-coverage test-short test-clean clean migrate-up migrate-down lint format docker-build docker-run
 
 # Default target
 help:
@@ -15,6 +15,8 @@ help:
 	@echo "  run           - Run the API server"
 	@echo "  test          - Run tests"
 	@echo "  test-coverage - Run tests with coverage"
+	@echo "  test-short    - Run tests in short mode"
+	@echo "  test-clean    - Clean test cache"
 	@echo "  lint          - Run linter"
 	@echo "  format        - Format code"
 	@echo "  clean         - Clean build artifacts"
@@ -84,6 +86,16 @@ test-coverage:
 	go test -v -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
+
+# Run tests in short mode
+test-short:
+	@echo "Running tests (short mode)..."
+	go test ./... -short
+
+# Clean test cache
+test-clean:
+	@echo "Cleaning test cache..."
+	go clean -testcache
 
 # Clean build artifacts
 clean:
