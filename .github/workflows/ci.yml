@@ -68,15 +68,32 @@ jobs:
 
     - name: Set up test environment
       run: |
-        cp env.example .env.test
-        echo "DB_HOST=localhost" >> .env.test
-        echo "DB_PORT=5432" >> .env.test
-        echo "DB_USER=testuser" >> .env.test
-        echo "DB_PASSWORD=testpass" >> .env.test
-        echo "DB_NAME=master_data_test" >> .env.test
-        echo "DB_SSL_MODE=disable" >> .env.test
-        echo "MEILISEARCH_HOST=http://localhost:7700" >> .env.test
-        echo "MEILISEARCH_API_KEY=testkey123" >> .env.test
+        cat > .env.test << EOF
+        # Test Environment Configuration
+        APP_NAME=Master Data REST API Test
+        APP_ENV=test
+        APP_VERSION=1.0.0
+        APP_PORT=8080
+        APP_HOST=localhost
+        
+        # Test Database Configuration
+        DB_DRIVER=postgres
+        DB_HOST=localhost
+        DB_PORT=5432
+        DB_NAME=master_data_test
+        DB_USER=testuser
+        DB_PASSWORD=testpass
+        DB_SSL_MODE=disable
+        
+        # Test Search Configuration
+        MEILISEARCH_HOST=http://localhost:7700
+        MEILISEARCH_API_KEY=testkey123
+        
+        # Test Logging Configuration
+        LOG_LEVEL=debug
+        LOG_FORMAT=text
+        LOG_OUTPUT=stdout
+        EOF
 
     - name: Run database migrations
       run: |
