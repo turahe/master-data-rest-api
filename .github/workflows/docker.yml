@@ -7,7 +7,7 @@ on:
       - develop
     paths:
       - 'Dockerfile'
-      - 'docker-compose.yml'
+      - 'docker compose.yml'
       - 'go.mod'
       - 'go.sum'
       - '**/*.go'
@@ -17,7 +17,7 @@ on:
       - develop
     paths:
       - 'Dockerfile'
-      - 'docker-compose.yml'
+      - 'docker compose.yml'
       - 'go.mod'
       - 'go.sum'
       - '**/*.go'
@@ -223,7 +223,7 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-  docker-compose-test:
+  docker compose-test:
     name: Docker Compose Test
     runs-on: ubuntu-latest
     
@@ -238,12 +238,12 @@ jobs:
         echo "MEILISEARCH_API_KEY=testkey123" >> .env
 
     - name: Start services with Docker Compose
-      run: docker-compose up -d
+      run: docker compose up -d
 
     - name: Wait for services to be ready
       run: |
         echo "Waiting for PostgreSQL..."
-        timeout 30 bash -c 'until docker-compose exec -T postgres pg_isready -U postgres; do sleep 1; done'
+        timeout 30 bash -c 'until docker compose exec -T postgres pg_isready -U postgres; do sleep 1; done'
         
         echo "Waiting for Meilisearch..."
         timeout 30 bash -c 'until curl -f http://localhost:7700/health; do sleep 1; done'
@@ -254,24 +254,24 @@ jobs:
     - name: Run integration tests
       run: |
         # Test database connection
-        docker-compose exec -T master_data_api ./master-data-api migrate status
+        docker compose exec -T master_data_api ./master-data-api migrate status
         
         # Test API endpoints
         curl -f http://localhost:8080/health
         
         # Test with API key (if migrations create one)
-        docker-compose exec -T master_data_api ./master-data-api create-api-key --name "test-key" > api_key.txt || true
+        docker compose exec -T master_data_api ./master-data-api create-api-key --name "test-key" > api_key.txt || true
 
     - name: Show service logs on failure
       if: failure()
       run: |
         echo "=== PostgreSQL logs ==="
-        docker-compose logs postgres
+        docker compose logs postgres
         echo "=== Meilisearch logs ==="
-        docker-compose logs meilisearch
+        docker compose logs meilisearch
         echo "=== API logs ==="
-        docker-compose logs master_data_api
+        docker compose logs master_data_api
 
     - name: Cleanup
       if: always()
-      run: docker-compose down -v
+      run: docker compose down -v
