@@ -37,12 +37,15 @@
 package cmd
 
 import (
+	"context"
+
 	"github.com/spf13/cobra"
 	"github.com/turahe/master-data-rest-api/configs"
 	"github.com/turahe/master-data-rest-api/internal/adapters/primary/http"
 	"github.com/turahe/master-data-rest-api/internal/adapters/primary/http/middleware"
 	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database"
 	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/database/pgx"
+	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/redis"
 	"github.com/turahe/master-data-rest-api/internal/adapters/secondary/search"
 	"github.com/turahe/master-data-rest-api/internal/domain/services"
 	"github.com/turahe/master-data-rest-api/pkg/logger"
@@ -192,9 +195,26 @@ func setupRouter(
 		},
 	})
 
+	// Initialize Redis manager and rate limiter
+	redisManager := redis.NewManager(&config.Redis, log.Logger)
+	rateLimiter := redis.NewRateLimiter(redisManager.GetClient(), log.Logger)
+
+	// Connect to Redis if enabled
+	if config.Redis.Enabled {
+		if err := redisManager.Connect(context.Background()); err != nil {
+			log.WithError(err).Warn("Failed to connect to Redis, rate limiting will be disabled")
+		}
+	}
+
 	// Add custom middleware
 	app.Use(middleware.RequestLoggerMiddleware(log))
 	app.Use(middleware.ErrorLoggerMiddleware(log))
+
+	// Add rate limiting middleware if Redis is enabled
+	if redisManager.IsEnabled() {
+		app.Use(middleware.TieredRateLimiter(rateLimiter))
+		log.Info("Rate limiting middleware enabled")
+	}
 
 	// Health check endpoint
 	app.Get("/health", func(c *fiber.Ctx) error {
@@ -213,6 +233,16 @@ func setupRouter(
 
 	// Apply API key authentication middleware
 	api.Use(middleware.APIKeyAuth(apiKeyService))
+
+	// Rate limit management routes (only if Redis is enabled)
+	if redisManager.IsEnabled() {
+		rateLimitHandler := http.NewRateLimitHTTPHandler(rateLimiter, log.Logger)
+		rateLimits := api.Group("/rate-limit")
+		rateLimits.Get("/info", rateLimitHandler.GetRateLimitInfo)
+		rateLimits.Get("/stats", rateLimitHandler.GetRateLimitStats)
+		rateLimits.Get("/config", rateLimitHandler.GetRateLimitConfig)
+		rateLimits.Post("/reset", rateLimitHandler.ResetRateLimit)
+	}
 
 	// Geodirectory routes
 	geodirectories := api.Group("/geodirectories")

@@ -62,3 +62,12 @@ func Unauthorized(c *fiber.Ctx, message string) error {
 func Forbidden(c *fiber.Ctx, message string) error {
 	return Error(c, fiber.StatusForbidden, message)
 }
+
+// TooManyRequests sends a too many requests response
+func TooManyRequests(c *fiber.Ctx, data interface{}, message string) error {
+	return c.Status(fiber.StatusTooManyRequests).JSON(Response{
+		Success: false,
+		Error:   message,
+		Data:    data,
+	})
+}

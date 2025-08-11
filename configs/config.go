@@ -15,6 +15,7 @@ type Config struct {
 	Auth        AuthConfig
 	Logging     LoggingConfig
 	Meilisearch MeilisearchConfig
+	Redis       RedisConfig
 }
 
 // AppConfig holds application-specific configuration
@@ -71,6 +72,19 @@ type MeilisearchConfig struct {
 	APIKey string
 }
 
+// RedisConfig holds Redis configuration
+type RedisConfig struct {
+	Host         string
+	Port         string
+	Password     string
+	DB           int
+	PoolSize     int
+	DialTimeout  time.Duration
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
+	Enabled      bool
+}
+
 // Load loads configuration from environment variables
 func Load() *Config {
 	return &Config{
@@ -100,20 +114,32 @@ func Load() *Config {
 			LogSlowQuery: getEnvAsDuration("DB_LOG_SLOW_QUERY", 100*time.Millisecond),
 		},
 		Server: ServerConfig{
-			Host: getEnv("APP_HOST", "localhost"),
-			Port: getEnv("APP_PORT", "8080"),
+			Host: getEnv("SERVER_HOST", "0.0.0.0"),
+			Port: getEnv("SERVER_PORT", "8080"),
 		},
 		Auth: AuthConfig{
-			// API keys are now managed in database
+			// Future auth configuration can be added here
+			// APIKey moved to database management
 		},
 		Logging: LoggingConfig{
 			Level:  getEnv("LOG_LEVEL", "info"),
-			Format: getEnv("LOG_FORMAT", "text"),
+			Format: getEnv("LOG_FORMAT", "json"),
 			Output: getEnv("LOG_OUTPUT", "stdout"),
 		},
 		Meilisearch: MeilisearchConfig{
-			Host:   getEnv("MEILISEARCH_HOST", "http://localhost:7700"),
+			Host:   getEnv("MEILISEARCH_HOST", "localhost:7700"),
 			APIKey: getEnv("MEILISEARCH_API_KEY", ""),
+		},
+		Redis: RedisConfig{
+			Host:         getEnv("REDIS_HOST", "localhost"),
+			Port:         getEnv("REDIS_PORT", "6379"),
+			Password:     getEnv("REDIS_PASSWORD", ""),
+			DB:           getEnvAsInt("REDIS_DB", 0),
+			PoolSize:     getEnvAsInt("REDIS_POOL_SIZE", 10),
+			DialTimeout:  getEnvAsDuration("REDIS_DIAL_TIMEOUT", 5*time.Second),
+			ReadTimeout:  getEnvAsDuration("REDIS_READ_TIMEOUT", 3*time.Second),
+			WriteTimeout: getEnvAsDuration("REDIS_WRITE_TIMEOUT", 3*time.Second),
+			Enabled:      getEnvAsBool("REDIS_ENABLED", false),
 		},
 	}
 }
