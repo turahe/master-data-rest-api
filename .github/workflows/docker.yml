@@ -1,5 +1,6 @@
 name: Docker
 
+# Force workflow refresh - Updated for optional authentication support
 on:
   push:
     branches:
