@@ -55,8 +55,7 @@ type ServerConfig struct {
 
 // AuthConfig holds authentication configuration
 type AuthConfig struct {
-	// Future auth configuration can be added here
-	// APIKey moved to database management
+	Required bool // Whether API key authentication is required
 }
 
 // LoggingConfig holds logging configuration
@@ -118,8 +117,7 @@ func Load() *Config {
 			Port: getEnv("SERVER_PORT", "8080"),
 		},
 		Auth: AuthConfig{
-			// Future auth configuration can be added here
-			// APIKey moved to database management
+			Required: getEnvAsBool("AUTH_REQUIRED", false),
 		},
 		Logging: LoggingConfig{
 			Level:  getEnv("LOG_LEVEL", "info"),

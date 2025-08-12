@@ -26,6 +26,7 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-development}
       APP_PORT: ${APP_PORT:-8080}
+      AUTH_REQUIRED: ${AUTH_REQUIRED:-false}
       DB_HOST: ${DB_HOST:-postgres}
       DB_PORT: ${DB_PORT:-5432}
       DB_NAME: ${DB_NAME:-master_data}

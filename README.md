@@ -21,7 +21,7 @@ A modern, high-performance REST API built with **Go** and **Hexagonal Architectu
 - 🏦 **Banking Information** - Complete bank master data with search capabilities
 - 💰 **Currency Management** - Multi-currency support with status management
 - 🗣️ **Language Support** - Localization and language information management
-- 🔐 **API Key Authentication** - Secure access control with key management
+- 🔐 **API Key Authentication** - Secure access control with key management (optional)
 - 🎯 **Modern CLI** - Cobra-powered command-line interface
 - 📊 **Database Logging** - Comprehensive query logging with performance metrics
 - 🚀 **High Performance** - Built with Fiber v2 and pgx for optimal speed
@@ -102,7 +102,7 @@ docker pull ghcr.io/turahe/master-data-rest-api:latest
    ./bin/master-data-api migrate up
    ```
 
-6. **Create an API key**
+6. **Create an API key** (optional - authentication is disabled by default)
    ```bash
    ./bin/master-data-api create-api-key --name "Development Key"
    ```
@@ -116,6 +116,8 @@ docker pull ghcr.io/turahe/master-data-rest-api:latest
    - API Base URL: `http://localhost:8080/api/v1`
    - Swagger Documentation: `http://localhost:8080/swagger/index.html`
    - Health Check: `http://localhost:8080/health`
+
+> **Note**: By default, authentication is **optional** (`AUTH_REQUIRED=false`). You can access endpoints without API keys. To enable required authentication, set `AUTH_REQUIRED=true` in your environment.
 
 ## 🏗️ Architecture
 

@@ -76,6 +76,11 @@ docker-compose ps
 | `DB_PASSWORD` | Database password | `apppassword` | `secretpass` |
 | `DB_NAME` | Database name | `master_data` | `master_data` |
 
+### Authentication Variables
+| Variable | Description | Default | Options |
+|----------|-------------|---------|---------|
+| `AUTH_REQUIRED` | Whether API key authentication is required | `false` | `true`, `false` |
+
 ### Optional Variables
 | Variable | Description | Default | Options |
 |----------|-------------|---------|---------|
@@ -85,6 +90,72 @@ docker-compose ps
 | `LOG_FORMAT` | Log format | `json` | `json`, `text` |
 | `MEILISEARCH_HOST` | Meilisearch server URL | `http://localhost:7700` | Meilisearch endpoint |
 | `MEILISEARCH_API_KEY` | Meilisearch API key | `` | Search service key |
+
+## 🐳 Docker Compose Example
+
+Here's a complete `docker-compose.yml` example with optional authentication:
+
+```yaml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:17
+    container_name: master_data_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: master_data
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - master_data_network
+
+  app:
+    image: turahe/master-data-rest-api:latest
+    container_name: master_data_api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      APP_ENV: development
+      APP_PORT: 8080
+      AUTH_REQUIRED: false  # Set to true to require authentication
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: master_data
+      DB_USER: appuser
+      DB_PASSWORD: apppassword
+      DB_DRIVER: postgres
+      DB_SSL_MODE: disable
+      MEILISEARCH_HOST: http://meilisearch:7700
+      MEILISEARCH_API_KEY: masterKey123
+    depends_on:
+      - postgres
+      - meilisearch
+    networks:
+      - master_data_network
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.5
+    container_name: master_data_meilisearch
+    restart: unless-stopped
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_MASTER_KEY: masterKey123
+      MEILI_ENV: development
+    volumes:
+      - ./data/meilisearch:/meili_data
+    networks:
+      - master_data_network
+
+networks:
+  master_data_network:
+    driver: bridge
+```
 
 ## 🌐 API Endpoints
 
@@ -106,7 +177,24 @@ curl http://localhost:8080/health
 
 ## 🔐 Authentication
 
-API uses API key authentication. Create an API key:
+### Authentication Modes
+
+The API supports two authentication modes:
+
+1. **Required Authentication** (`AUTH_REQUIRED=true`): API key is mandatory for all endpoints
+2. **Optional Authentication** (`AUTH_REQUIRED=false`): API key is optional but validated when provided
+
+### Default Behavior
+
+By default, authentication is **optional** (`AUTH_REQUIRED=false`). This means:
+- Endpoints can be accessed without authentication
+- When a valid API key is provided, it's validated and user information is available
+- Invalid or expired API keys are ignored (user continues as anonymous)
+- Anonymous users have access to all public endpoints
+
+### Creating an API Key
+
+To create an API key when authentication is enabled:
 
 ```bash
 # Using Docker exec
@@ -128,6 +216,40 @@ curl -H "Authorization: Bearer your-api-key" http://localhost:8080/api/v1/banks
 
 # Using X-API-Key header (alternative)
 curl -H "X-API-Key: your-api-key" http://localhost:8080/api/v1/banks
+```
+
+### Using the API Without Authentication
+
+When `AUTH_REQUIRED=false` (default), you can access endpoints without authentication:
+
+```bash
+# Access endpoints without any authentication headers
+curl http://localhost:8080/api/v1/banks
+curl http://localhost:8080/api/v1/currencies
+curl http://localhost:8080/api/v1/languages
+curl http://localhost:8080/api/v1/geodirectories
+
+# Health check (always public)
+curl http://localhost:8080/health
+
+# Swagger documentation (always public)
+curl http://localhost:8080/swagger/index.html
+```
+
+### Enabling Required Authentication
+
+To require authentication for all endpoints, set the environment variable:
+
+```bash
+# In docker-compose.yml
+environment:
+  AUTH_REQUIRED: "true"
+
+# Or when running with docker run
+docker run -e AUTH_REQUIRED=true turahe/master-data-rest-api:latest
+
+# Or in .env file
+AUTH_REQUIRED=true
 ```
 
 ## 📊 Complete Setup Example

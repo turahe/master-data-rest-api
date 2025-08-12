@@ -18,7 +18,7 @@
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
-// @description Enter your API key in the format: Bearer YOUR_API_KEY
+// @description Enter your API key in the format: Bearer YOUR_API_KEY (optional when AUTH_REQUIRED=false)
 //
 // @tag.name geodirectories
 // @tag.description Operations for managing geographical directories (countries, provinces, cities, districts, villages)
@@ -231,8 +231,14 @@ func setupRouter(
 	// API routes
 	api := app.Group("/api/v1")
 
-	// Apply API key authentication middleware
-	api.Use(middleware.APIKeyAuth(apiKeyService))
+	// Apply authentication middleware based on configuration
+	if config.Auth.Required {
+		// Strict authentication - API key is required
+		api.Use(middleware.APIKeyAuth(apiKeyService))
+	} else {
+		// Optional authentication - API key is optional but validated when provided
+		api.Use(middleware.OptionalAPIKeyAuth(apiKeyService))
+	}
 
 	// Rate limit management routes (only if Redis is enabled)
 	if redisManager.IsEnabled() {
