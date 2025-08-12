@@ -58,7 +58,7 @@ jobs:
         context: .
         platforms: linux/amd64
         push: false
-        tags: master-data-api:test
+        tags: ${{ env.IMAGE_NAME }}:test
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -120,7 +120,7 @@ jobs:
 
     - name: Test Docker image - Version
       run: |
-        docker run --rm master-data-api:test version
+        docker run --rm ${{ env.IMAGE_NAME }}:test version
 
     - name: Test Docker image - Health check
       env:
@@ -141,6 +141,8 @@ jobs:
         # Test Search Configuration
         MEILISEARCH_HOST: http://host.docker.internal:7700
         MEILISEARCH_API_KEY: testkey123
+        # Test Authentication Configuration
+        AUTH_REQUIRED: false
         # Test Logging Configuration
         LOG_LEVEL: debug
         LOG_FORMAT: text
@@ -164,10 +166,11 @@ jobs:
           -e DB_SSL_MODE="$DB_SSL_MODE" \
           -e MEILISEARCH_HOST="$MEILISEARCH_HOST" \
           -e MEILISEARCH_API_KEY="$MEILISEARCH_API_KEY" \
+          -e AUTH_REQUIRED="$AUTH_REQUIRED" \
           -e LOG_LEVEL="$LOG_LEVEL" \
           -e LOG_FORMAT="$LOG_FORMAT" \
           -e LOG_OUTPUT="$LOG_OUTPUT" \
-          master-data-api:test serve
+          ${{ env.IMAGE_NAME }}:test serve
         
         # Wait for container to start
         sleep 10
@@ -289,6 +292,9 @@ jobs:
         # Docker Search Configuration
         MEILISEARCH_HOST=http://meilisearch:7700
         MEILISEARCH_API_KEY=testkey123
+        
+        # Docker Authentication Configuration
+        AUTH_REQUIRED=false
         
         # Logging Configuration
         LOG_LEVEL=info
