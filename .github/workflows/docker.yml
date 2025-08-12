@@ -59,7 +59,7 @@ jobs:
         context: .
         platforms: linux/amd64
         push: false
-        tags: ${{ env.IMAGE_NAME }}:test
+        tags: ${{ env.IMAGE_NAME }}:latest
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -121,7 +121,7 @@ jobs:
 
     - name: Test Docker image - Version
       run: |
-        docker run --rm ${{ env.IMAGE_NAME }}:test version
+        docker run --rm ${{ env.IMAGE_NAME }}:latest version
 
     - name: Test Docker image - Health check
       env:
@@ -171,7 +171,7 @@ jobs:
           -e LOG_LEVEL="$LOG_LEVEL" \
           -e LOG_FORMAT="$LOG_FORMAT" \
           -e LOG_OUTPUT="$LOG_OUTPUT" \
-          ${{ env.IMAGE_NAME }}:test serve
+          ${{ env.IMAGE_NAME }}:latest serve
         
         # Wait for container to start
         sleep 10
