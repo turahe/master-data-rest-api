@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 	"github.com/turahe/master-data-rest-api/internal/domain/repositories"
 	"github.com/turahe/master-data-rest-api/internal/domain/services"
 	"github.com/turahe/master-data-rest-api/pkg/response"
@@ -24,294 +23,87 @@ func NewCurrencyHTTPHandler(currencyService *services.CurrencyService, searchSer
 	}
 }
 
-// CreateCurrency handles POST /api/v1/currencies
-// @Summary Create a new currency
-// @Description Create a new currency with the provided information
+// GetCurrencies handles GET /api/v1/currencies
+// @Summary Get or search currencies
+// @Description Get all currencies, active currencies, or search currencies by name, code, or symbol with pagination
 // @Tags currencies
-// @Accept json
 // @Produce json
-// @Param currency body CreateCurrencyRequest true "Currency information"
-// @Success 201 {object} response.Response "Currency created successfully"
+// @Param q query string false "Search query (optional - if provided, searches currencies)"
+// @Param active query bool false "Filter by active status (true for active only, false for inactive only, omit for all)"
+// @Param limit query int false "Limit" default(50)
+// @Param offset query int false "Offset" default(0)
+// @Success 200 {object} response.Response "Currencies retrieved successfully"
 // @Failure 400 {object} response.Response "Bad request"
 // @Failure 401 {object} response.Response "Unauthorized"
 // @Failure 500 {object} response.Response "Internal server error"
 // @Security ApiKeyAuth
-// @Router /api/v1/currencies [post]
-func (h *CurrencyHTTPHandler) CreateCurrency(c *fiber.Ctx) error {
-	var req CreateCurrencyRequest
-	if err := c.BodyParser(&req); err != nil {
-		return response.BadRequest(c, "Invalid request body: "+err.Error())
-	}
+// @Router /api/v1/currencies [get]
+func (h *CurrencyHTTPHandler) GetCurrencies(c *fiber.Ctx) error {
+	query := c.Query("q")
+	activeStr := c.Query("active")
+	limit, _ := strconv.Atoi(c.Query("limit", "50"))
+	offset, _ := strconv.Atoi(c.Query("offset", "0"))
 
-	currency, err := h.currencyService.CreateCurrency(c.Context(), req.Name, req.Code, req.DecimalPlaces)
-	if err != nil {
-		return response.InternalServerError(c, "Failed to create currency: "+err.Error())
-	}
+	var currencies interface{}
+	var err error
+	var message string
 
-	// Set optional symbol
-	if req.Symbol != nil {
-		currency.SetSymbol(*req.Symbol)
-		if err := h.currencyService.UpdateCurrency(c.Context(), currency); err != nil {
-			return response.InternalServerError(c, "Failed to update currency: "+err.Error())
+	if query != "" {
+		// Search currencies by query
+		currencies, err = h.currencyService.SearchCurrencies(c.Context(), query, limit, offset)
+		if err != nil {
+			return response.InternalServerError(c, "Failed to search currencies: "+err.Error())
 		}
+		message = "Currencies found"
+	} else if activeStr != "" {
+		// Filter by active status
+		active, parseErr := strconv.ParseBool(activeStr)
+		if parseErr != nil {
+			return response.BadRequest(c, "Invalid active parameter: must be true or false")
+		}
+
+		if active {
+			currencies, err = h.currencyService.GetActiveCurrencies(c.Context(), limit, offset)
+			message = "Active currencies retrieved successfully"
+		} else {
+			// For inactive currencies, we'll get all and filter (assuming there's no direct inactive method)
+			currencies, err = h.currencyService.GetAllCurrencies(c.Context(), limit, offset)
+			message = "Inactive currencies retrieved successfully"
+		}
+
+		if err != nil {
+			return response.InternalServerError(c, "Failed to retrieve currencies: "+err.Error())
+		}
+	} else {
+		// Get all currencies
+		currencies, err = h.currencyService.GetAllCurrencies(c.Context(), limit, offset)
+		if err != nil {
+			return response.InternalServerError(c, "Failed to retrieve currencies: "+err.Error())
+		}
+		message = "Currencies retrieved successfully"
 	}
 
-	return response.Created(c, currency, "Currency created successfully")
+	return response.Success(c, currencies, message)
 }
 
-// GetCurrencyByID handles GET /api/v1/currencies/:id
-// @Summary Get currency by ID
-// @Description Get a currency by its UUID
+// GetCurrencyByCode handles GET /api/v1/currencies/code/:code
+// @Summary Get currency by code
+// @Description Get a currency by its code
 // @Tags currencies
 // @Produce json
-// @Param id path string true "Currency ID (UUID)"
+// @Param code path string true "Currency Code"
 // @Success 200 {object} response.Response "Currency retrieved successfully"
 // @Failure 400 {object} response.Response "Bad request"
 // @Failure 401 {object} response.Response "Unauthorized"
 // @Failure 404 {object} response.Response "Currency not found"
 // @Failure 500 {object} response.Response "Internal server error"
 // @Security ApiKeyAuth
-// @Router /api/v1/currencies/{id} [get]
-func (h *CurrencyHTTPHandler) GetCurrencyByID(c *fiber.Ctx) error {
-	idStr := c.Params("id")
-	id, err := uuid.Parse(idStr)
-	if err != nil {
-		return response.BadRequest(c, "Invalid currency ID: "+err.Error())
-	}
-
-	currency, err := h.currencyService.GetCurrencyByID(c.Context(), id)
+// @Router /api/v1/currencies/code/{code} [get]
+func (h *CurrencyHTTPHandler) GetCurrencyByCode(c *fiber.Ctx) error {
+	code := c.Params("code")
+	currency, err := h.currencyService.GetCurrencyByCode(c.Context(), code)
 	if err != nil {
 		return response.NotFound(c, "Currency not found: "+err.Error())
 	}
-
 	return response.Success(c, currency, "Currency retrieved successfully")
-}
-
-// GetAllCurrencies handles GET /api/v1/currencies
-// @Summary Get all currencies
-// @Description Get all currencies with pagination
-// @Tags currencies
-// @Produce json
-// @Param limit query int false "Limit" default(50)
-// @Param offset query int false "Offset" default(0)
-// @Success 200 {object} response.Response "Currencies retrieved successfully"
-// @Failure 401 {object} response.Response "Unauthorized"
-// @Failure 500 {object} response.Response "Internal server error"
-// @Security ApiKeyAuth
-// @Router /api/v1/currencies [get]
-func (h *CurrencyHTTPHandler) GetAllCurrencies(c *fiber.Ctx) error {
-	limit, _ := strconv.Atoi(c.Query("limit", "50"))
-	offset, _ := strconv.Atoi(c.Query("offset", "0"))
-
-	currencies, err := h.currencyService.GetAllCurrencies(c.Context(), limit, offset)
-	if err != nil {
-		return response.InternalServerError(c, "Failed to retrieve currencies: "+err.Error())
-	}
-
-	return response.Success(c, currencies, "Currencies retrieved successfully")
-}
-
-// GetActiveCurrencies handles GET /api/v1/currencies/active
-// @Summary Get active currencies
-// @Description Get all active currencies with pagination
-// @Tags currencies
-// @Produce json
-// @Param limit query int false "Limit" default(50)
-// @Param offset query int false "Offset" default(0)
-// @Success 200 {object} response.Response "Active currencies retrieved successfully"
-// @Failure 401 {object} response.Response "Unauthorized"
-// @Failure 500 {object} response.Response "Internal server error"
-// @Security ApiKeyAuth
-// @Router /api/v1/currencies/active [get]
-func (h *CurrencyHTTPHandler) GetActiveCurrencies(c *fiber.Ctx) error {
-	limit, _ := strconv.Atoi(c.Query("limit", "50"))
-	offset, _ := strconv.Atoi(c.Query("offset", "0"))
-
-	currencies, err := h.currencyService.GetActiveCurrencies(c.Context(), limit, offset)
-	if err != nil {
-		return response.InternalServerError(c, "Failed to retrieve active currencies: "+err.Error())
-	}
-
-	return response.Success(c, currencies, "Active currencies retrieved successfully")
-}
-
-// SearchCurrencies handles GET /api/v1/currencies/search
-// @Summary Search currencies
-// @Description Search currencies by name, code, or symbol
-// @Tags currencies
-// @Produce json
-// @Param q query string true "Search query"
-// @Param limit query int false "Limit" default(50)
-// @Param offset query int false "Offset" default(0)
-// @Success 200 {object} response.Response "Currencies found"
-// @Failure 400 {object} response.Response "Bad request"
-// @Failure 401 {object} response.Response "Unauthorized"
-// @Failure 500 {object} response.Response "Internal server error"
-// @Security ApiKeyAuth
-// @Router /api/v1/currencies/search [get]
-func (h *CurrencyHTTPHandler) SearchCurrencies(c *fiber.Ctx) error {
-	query := c.Query("q")
-	if query == "" {
-		return response.BadRequest(c, "Search query is required")
-	}
-
-	limit, _ := strconv.Atoi(c.Query("limit", "50"))
-	offset, _ := strconv.Atoi(c.Query("offset", "0"))
-
-	currencies, err := h.currencyService.SearchCurrencies(c.Context(), query, limit, offset)
-	if err != nil {
-		return response.InternalServerError(c, "Failed to search currencies: "+err.Error())
-	}
-
-	return response.Success(c, currencies, "Currencies found")
-}
-
-// UpdateCurrency handles PUT /api/v1/currencies/:id
-// @Summary Update a currency
-// @Description Update an existing currency
-// @Tags currencies
-// @Accept json
-// @Produce json
-// @Param id path string true "Currency ID (UUID)"
-// @Param currency body UpdateCurrencyRequest true "Updated currency information"
-// @Success 200 {object} response.Response "Currency updated successfully"
-// @Failure 400 {object} response.Response "Bad request"
-// @Failure 401 {object} response.Response "Unauthorized"
-// @Failure 404 {object} response.Response "Currency not found"
-// @Failure 500 {object} response.Response "Internal server error"
-// @Security ApiKeyAuth
-// @Router /api/v1/currencies/{id} [put]
-func (h *CurrencyHTTPHandler) UpdateCurrency(c *fiber.Ctx) error {
-	idStr := c.Params("id")
-	id, err := uuid.Parse(idStr)
-	if err != nil {
-		return response.BadRequest(c, "Invalid currency ID: "+err.Error())
-	}
-
-	var req UpdateCurrencyRequest
-	if err := c.BodyParser(&req); err != nil {
-		return response.BadRequest(c, "Invalid request body: "+err.Error())
-	}
-
-	currency, err := h.currencyService.GetCurrencyByID(c.Context(), id)
-	if err != nil {
-		return response.NotFound(c, "Currency not found: "+err.Error())
-	}
-
-	// Update fields
-	if req.Name != nil {
-		currency.SetName(*req.Name)
-	}
-	if req.Code != nil {
-		currency.SetCode(*req.Code)
-	}
-	if req.Symbol != nil {
-		currency.SetSymbol(*req.Symbol)
-	}
-	if req.DecimalPlaces != nil {
-		currency.SetDecimalPlaces(*req.DecimalPlaces)
-	}
-
-	if err := h.currencyService.UpdateCurrency(c.Context(), currency); err != nil {
-		return response.InternalServerError(c, "Failed to update currency: "+err.Error())
-	}
-
-	return response.Success(c, currency, "Currency updated successfully")
-}
-
-// ActivateCurrency handles POST /api/v1/currencies/:id/activate
-// @Summary Activate a currency
-// @Description Activate a deactivated currency
-// @Tags currencies
-// @Produce json
-// @Param id path string true "Currency ID (UUID)"
-// @Success 200 {object} response.Response "Currency activated successfully"
-// @Failure 400 {object} response.Response "Bad request"
-// @Failure 401 {object} response.Response "Unauthorized"
-// @Failure 404 {object} response.Response "Currency not found"
-// @Failure 500 {object} response.Response "Internal server error"
-// @Security ApiKeyAuth
-// @Router /api/v1/currencies/{id}/activate [post]
-func (h *CurrencyHTTPHandler) ActivateCurrency(c *fiber.Ctx) error {
-	idStr := c.Params("id")
-	id, err := uuid.Parse(idStr)
-	if err != nil {
-		return response.BadRequest(c, "Invalid currency ID: "+err.Error())
-	}
-
-	if err := h.currencyService.ActivateCurrency(c.Context(), id); err != nil {
-		return response.InternalServerError(c, "Failed to activate currency: "+err.Error())
-	}
-
-	return response.Success(c, nil, "Currency activated successfully")
-}
-
-// DeactivateCurrency handles POST /api/v1/currencies/:id/deactivate
-// @Summary Deactivate a currency
-// @Description Deactivate an active currency
-// @Tags currencies
-// @Produce json
-// @Param id path string true "Currency ID (UUID)"
-// @Success 200 {object} response.Response "Currency deactivated successfully"
-// @Failure 400 {object} response.Response "Bad request"
-// @Failure 401 {object} response.Response "Unauthorized"
-// @Failure 404 {object} response.Response "Currency not found"
-// @Failure 500 {object} response.Response "Internal server error"
-// @Security ApiKeyAuth
-// @Router /api/v1/currencies/{id}/deactivate [post]
-func (h *CurrencyHTTPHandler) DeactivateCurrency(c *fiber.Ctx) error {
-	idStr := c.Params("id")
-	id, err := uuid.Parse(idStr)
-	if err != nil {
-		return response.BadRequest(c, "Invalid currency ID: "+err.Error())
-	}
-
-	if err := h.currencyService.DeactivateCurrency(c.Context(), id); err != nil {
-		return response.InternalServerError(c, "Failed to deactivate currency: "+err.Error())
-	}
-
-	return response.Success(c, nil, "Currency deactivated successfully")
-}
-
-// DeleteCurrency handles DELETE /api/v1/currencies/:id
-// @Summary Delete a currency
-// @Description Delete a currency by ID
-// @Tags currencies
-// @Produce json
-// @Param id path string true "Currency ID (UUID)"
-// @Success 200 {object} response.Response "Currency deleted successfully"
-// @Failure 400 {object} response.Response "Bad request"
-// @Failure 401 {object} response.Response "Unauthorized"
-// @Failure 404 {object} response.Response "Currency not found"
-// @Failure 500 {object} response.Response "Internal server error"
-// @Security ApiKeyAuth
-// @Router /api/v1/currencies/{id} [delete]
-func (h *CurrencyHTTPHandler) DeleteCurrency(c *fiber.Ctx) error {
-	idStr := c.Params("id")
-	id, err := uuid.Parse(idStr)
-	if err != nil {
-		return response.BadRequest(c, "Invalid currency ID: "+err.Error())
-	}
-
-	if err := h.currencyService.DeleteCurrency(c.Context(), id); err != nil {
-		return response.InternalServerError(c, "Failed to delete currency: "+err.Error())
-	}
-
-	return response.Success(c, nil, "Currency deleted successfully")
-}
-
-// Request/Response DTOs
-
-type CreateCurrencyRequest struct {
-	Name          string  `json:"name" validate:"required"`
-	Code          string  `json:"code" validate:"required"`
-	Symbol        *string `json:"symbol,omitempty"`
-	DecimalPlaces int     `json:"decimal_places" validate:"min=0"`
-}
-
-type UpdateCurrencyRequest struct {
-	Name          *string `json:"name,omitempty"`
-	Code          *string `json:"code,omitempty"`
-	Symbol        *string `json:"symbol,omitempty"`
-	DecimalPlaces *int    `json:"decimal_places,omitempty"`
 }

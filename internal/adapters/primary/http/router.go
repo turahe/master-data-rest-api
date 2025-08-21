@@ -90,19 +90,14 @@ func SetupRouter(
 
 	// Geodirectory routes
 	geodirectories := api.Group("/geodirectories")
-	geodirectories.Post("/", geodirectoryHandler.CreateGeodirectory)
 	geodirectories.Get("/", geodirectoryHandler.GetAllGeodirectories)
 	geodirectories.Get("/search", geodirectoryHandler.SearchGeodirectories)
 	geodirectories.Get("/type/:type", geodirectoryHandler.GetGeodirectoriesByType)
-	geodirectories.Post("/rebuild", geodirectoryHandler.RebuildNestedSet)
 	geodirectories.Get("/:id", geodirectoryHandler.GetGeodirectoryByID)
 	geodirectories.Get("/:id/hierarchy", geodirectoryHandler.GetGeodirectoryWithHierarchy)
 	geodirectories.Get("/:id/children", geodirectoryHandler.GetChildren)
 	geodirectories.Get("/:id/ancestors", geodirectoryHandler.GetAncestors)
 	geodirectories.Get("/:id/descendants", geodirectoryHandler.GetDescendants)
-	geodirectories.Put("/:id", geodirectoryHandler.UpdateGeodirectory)
-	geodirectories.Post("/:id/move", geodirectoryHandler.MoveGeodirectory)
-	geodirectories.Delete("/:id", geodirectoryHandler.DeleteGeodirectory)
 
 	// Backward compatibility routes for countries, provinces, cities, etc.
 	countries := api.Group("/countries")
@@ -172,37 +167,18 @@ func SetupRouter(
 
 	// Bank routes
 	banks := api.Group("/banks")
-	banks.Post("/", bankHandler.CreateBank)
-	banks.Get("/", bankHandler.GetAllBanks)
-	banks.Get("/search", bankHandler.SearchBanks)
-	banks.Get("/code/:code", bankHandler.GetBankByCode)
-	banks.Get("/:id", bankHandler.GetBankByID)
-	banks.Put("/:id", bankHandler.UpdateBank)
-	banks.Delete("/:id", bankHandler.DeleteBank)
+	banks.Get("/", bankHandler.GetBanks)
+	banks.Get("/:code", bankHandler.GetBankByCode)
 
 	// Currency routes
 	currencies := api.Group("/currencies")
-	currencies.Post("/", currencyHandler.CreateCurrency)
-	currencies.Get("/", currencyHandler.GetAllCurrencies)
-	currencies.Get("/active", currencyHandler.GetActiveCurrencies)
-	currencies.Get("/search", currencyHandler.SearchCurrencies)
-	currencies.Get("/:id", currencyHandler.GetCurrencyByID)
-	currencies.Put("/:id", currencyHandler.UpdateCurrency)
-	currencies.Post("/:id/activate", currencyHandler.ActivateCurrency)
-	currencies.Post("/:id/deactivate", currencyHandler.DeactivateCurrency)
-	currencies.Delete("/:id", currencyHandler.DeleteCurrency)
+	currencies.Get("/", currencyHandler.GetCurrencies)
+	currencies.Get("/:code", currencyHandler.GetCurrencyByCode)
 
 	// Language routes
 	languages := api.Group("/languages")
-	languages.Post("/", languageHandler.CreateLanguage)
 	languages.Get("/", languageHandler.GetAllLanguages)
-	languages.Get("/active", languageHandler.GetActiveLanguages)
 	languages.Get("/search", languageHandler.SearchLanguages)
-	languages.Get("/:id", languageHandler.GetLanguageByID)
-	languages.Put("/:id", languageHandler.UpdateLanguage)
-	languages.Post("/:id/activate", languageHandler.ActivateLanguage)
-	languages.Post("/:id/deactivate", languageHandler.DeactivateLanguage)
-	languages.Delete("/:id", languageHandler.DeleteLanguage)
 
 	return app
 }
