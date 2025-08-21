@@ -1881,9 +1881,110 @@ paths:
       summary: Search languages
       tags:
       - languages
+  /api/v1/rate-limit/config:
+    get:
+      description: Get current rate limit configuration for different endpoints
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rate limit configuration retrieved successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get rate limit configuration
+      tags:
+      - rate-limit
+  /api/v1/rate-limit/info:
+    get:
+      description: Get current rate limit information for the requesting client
+      parameters:
+      - description: Client identifier (IP, user ID, or API key)
+        in: query
+        name: identifier
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rate limit information retrieved successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get rate limit information
+      tags:
+      - rate-limit
+  /api/v1/rate-limit/reset:
+    post:
+      consumes:
+      - application/json
+      description: Reset rate limit for a specific client identifier
+      parameters:
+      - description: Client identifier to reset
+        in: body
+        name: identifier
+        required: true
+        schema:
+          type: string
+      - description: 'Rate limit key to reset (default: api)'
+        in: body
+        name: key
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rate limit reset successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Reset rate limit for a client
+      tags:
+      - rate-limit
+  /api/v1/rate-limit/stats:
+    get:
+      description: Get comprehensive rate limit statistics across all clients
+      parameters:
+      - description: Rate limit key to get stats for (api, ip, user, apikey)
+        in: query
+        name: key
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rate limit statistics retrieved successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get rate limit statistics
+      tags:
+      - rate-limit
 securityDefinitions:
   ApiKeyAuth:
-    description: 'Enter your API key in the format: Bearer YOUR_API_KEY'
+    description: 'Enter your API key in the format: Bearer YOUR_API_KEY (optional
+      when AUTH_REQUIRED=false)'
     in: header
     name: Authorization
     type: apiKey

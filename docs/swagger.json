@@ -2694,6 +2694,160 @@
                     }
                 }
             }
+        },
+        "/api/v1/rate-limit/config": {
+            "get": {
+                "description": "Get current rate limit configuration for different endpoints",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rate-limit"
+                ],
+                "summary": "Get rate limit configuration",
+                "responses": {
+                    "200": {
+                        "description": "Rate limit configuration retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/rate-limit/info": {
+            "get": {
+                "description": "Get current rate limit information for the requesting client",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rate-limit"
+                ],
+                "summary": "Get rate limit information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Client identifier (IP, user ID, or API key)",
+                        "name": "identifier",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rate limit information retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/rate-limit/reset": {
+            "post": {
+                "description": "Reset rate limit for a specific client identifier",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rate-limit"
+                ],
+                "summary": "Reset rate limit for a client",
+                "parameters": [
+                    {
+                        "description": "Client identifier to reset",
+                        "name": "identifier",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Rate limit key to reset (default: api)",
+                        "name": "key",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rate limit reset successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/rate-limit/stats": {
+            "get": {
+                "description": "Get comprehensive rate limit statistics across all clients",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rate-limit"
+                ],
+                "summary": "Get rate limit statistics",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Rate limit key to get stats for (api, ip, user, apikey)",
+                        "name": "key",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rate limit statistics retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2914,7 +3068,7 @@
     },
     "securityDefinitions": {
         "ApiKeyAuth": {
-            "description": "Enter your API key in the format: Bearer YOUR_API_KEY",
+            "description": "Enter your API key in the format: Bearer YOUR_API_KEY (optional when AUTH_REQUIRED=false)",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
